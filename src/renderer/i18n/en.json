@@ -1,0 +1,20 @@
+{
+  "skeleton": {
+    "panel": {
+      "link": {
+        "evitaDBDocumentation": {
+          "icon": {
+            "alt": "evitaDB Documentation"
+          },
+          "tooltip": "Open evitaDB documentation"
+        },
+        "discord": {
+          "icon": {
+            "alt": "Discord"
+          },
+          "tooltip": "Discuss on Discord"
+        }
+      }
+    }
+  }
+}
