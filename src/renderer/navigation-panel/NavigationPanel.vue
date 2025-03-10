@@ -10,9 +10,23 @@ const connectionManager: ConnectionManagerApi = window.connectionManager
 //@ts-ignore
 const modalManager: ModalManagerApi = window.modalManager
 
+const shown = ref<boolean>(false)
 const connections = ref<Connection[]>([])
 connectionManager.connections()
     .then((fetchedConnections: Connection[]) => connections.value = fetchedConnections)
+
+connectionManager.onConnectionsChange((newConnections: Connection[]) =>
+    connections.value = newConnections)
+
+modalManager.onModalVisibilityChange((url: string, visible: boolean) => {
+    console.log(url, visible)
+    if (url !== '/navigation-panel/navigation-panel.html') {
+        return
+    }
+    if (visible === true) {
+        shown.value = true
+    }
+})
 
 function selectConnection(item: any): void {
     if (!item.value) {
@@ -23,14 +37,23 @@ function selectConnection(item: any): void {
 }
 
 function closeNavigationPanel(): void {
+    shown.value = false // todo lho <-- doens't hide it nicely
     modalManager.closeModal('/navigation-panel/navigation-panel.html')
+}
+
+function addConnection(): void {
+    modalManager.openModal('/connection/editor/connection-editor.html')
 }
 
 </script>
 
 <template>
     <VApp style="background-color: transparent">
-        <VNavigationDrawer :model-value="true" :width="300" @mouseleave="closeNavigationPanel">
+        <VNavigationDrawer
+            permanent
+            :width="300"
+            @mouseleave="closeNavigationPanel"
+        >
             <VListItem>
                 evitaLab
             </VListItem>
@@ -52,6 +75,12 @@ function closeNavigationPanel(): void {
                     </template>
                 </VListItem>
             </VList>
+
+            <VBtn @click="addConnection">
+                Add connection
+            </VBtn>
         </VNavigationDrawer>
+<!-- todo lho use modal background-->
+        <VMain style="background-color: #00000055"></VMain>
     </VApp>
 </template>

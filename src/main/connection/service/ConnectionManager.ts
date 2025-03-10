@@ -1,17 +1,29 @@
 import { ConnectionId } from '../model/ConnectionId'
 import { Connection } from '../model/Connection'
 import { List } from 'immutable'
+import {
+    connectionManagerApi_onConnectionActivation,
+    connectionManagerApi_onConnectionsChange
+} from '../../../preload/api/ConnectionManagerApi'
+import { SkeletonManager } from '../../skeleton/service/SkeletonManager'
+import { ModalManager } from '../../modal/service/ModalManager'
 
 /**
  * Manages all evitaDB server connections. This is the main part of the desktop wrapper.
  */
 export class ConnectionManager {
 
+    private readonly skeletonManager: SkeletonManager
+    private readonly modalManager: ModalManager
+
     private readonly _connections: Map<ConnectionId, Connection>
     private _activeConnection: ConnectionId | undefined
     private readonly onActivateConnectionCallbacks: ((newConnection: Connection) => void)[] = []
 
-    constructor() {
+    constructor(skeletonManager: SkeletonManager,
+                modalManager: ModalManager) {
+        this.skeletonManager = skeletonManager
+        this.modalManager = modalManager
         // todo lho temporary
         this._connections = new Map([
             ['con-1', new Connection('con-1', 'Connection 1', 'https://demo.evitadb.io:5555', '1')],
@@ -19,7 +31,10 @@ export class ConnectionManager {
         ]);
     }
 
-    get activeConnection(): Connection {
+    get activeConnection(): Connection | undefined {
+        if (this._activeConnection == undefined) {
+            return undefined
+        }
         return this._connections.get(this._activeConnection)
     }
 
@@ -32,12 +47,7 @@ export class ConnectionManager {
             throw new Error(`Cannot activate connection ${connectionId}, it doesn't exist.`)
         }
         this._activeConnection = connectionId
-        if (connectionId != undefined) {
-            const newConnection: Connection = this._connections.get(connectionId)
-            this.onActivateConnectionCallbacks.forEach(callback => callback(newConnection))
-        } else {
-            this.onActivateConnectionCallbacks.forEach(callback => callback(undefined))
-        }
+        this.notifyConnectionActivated()
     }
 
     addOnActivateConnectionCallback(callback: (newConnection: Connection | undefined) => void): void {
@@ -49,9 +59,28 @@ export class ConnectionManager {
             throw new Error(`Connection ${connection.id} already exists.`);
         }
         this._connections.set(connection.id, connection);
+        this.notifyConnectionsChange()
     }
 
     removeConnection(connectionId: ConnectionId): void {
         this._connections.delete(connectionId);
+        this.notifyConnectionsChange()
+    }
+
+    private notifyConnectionActivated(): void {
+        const activatedConnection: Connection | undefined = this.activeConnection
+
+        this.onActivateConnectionCallbacks.forEach(callback => callback(activatedConnection))
+
+        this.skeletonManager.skeletonWindow.webContents.send(connectionManagerApi_onConnectionActivation, activatedConnection)
+        this.modalManager.modals.forEach(modal =>
+            modal.webContents.send(connectionManagerApi_onConnectionActivation, activatedConnection))
+    }
+
+    private notifyConnectionsChange(): void {
+        const connections: Connection[] = this.connections.toArray()
+        this.skeletonManager.skeletonWindow.webContents.send(connectionManagerApi_onConnectionsChange, connections)
+        this.modalManager.modals.forEach(modal =>
+            modal.webContents.send(connectionManagerApi_onConnectionsChange, connections))
     }
 }

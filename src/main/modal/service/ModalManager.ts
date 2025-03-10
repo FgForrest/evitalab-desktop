@@ -1,6 +1,8 @@
 import { BrowserWindow, WebContentsView } from 'electron'
 import path from 'path'
 import Rectangle = Electron.Rectangle
+import { modalManagerApi_onModalVisibilityChange } from '../../../preload/api/ModalManagerApi'
+import { List } from 'immutable'
 
 /**
  * Manages opening and closing modals
@@ -13,6 +15,10 @@ export class ModalManager {
 
     constructor() {
         this.initializedModals = new Map()
+    }
+
+    get modals(): List<WebContentsView> {
+        return List(this.initializedModals.values())
     }
 
     set skeletonWindow(skeletonWindow: BrowserWindow) {
@@ -36,11 +42,13 @@ export class ModalManager {
         const modal: WebContentsView = this.getInitializedModal(url)
         // rearranges the existing child view to be the top most child
         this._skeletonWindow.contentView.addChildView(modal)
+        this.notifyModalVisibilityChange(modal, url, true)
         modal.setVisible(true)
     }
 
     private hideModal(url: string): void {
         const modal: WebContentsView = this.getInitializedModal(url)
+        this.notifyModalVisibilityChange(modal, url, false)
         modal.setVisible(false)
     }
 
@@ -64,7 +72,12 @@ export class ModalManager {
         }
 
         this._skeletonWindow.contentView.addChildView(newModal)
+        this.notifyModalVisibilityChange(newModal, url, true)
         this.initializedModals.set(url, newModal)
+    }
+
+    private notifyModalVisibilityChange(modal: WebContentsView, url: string, visible: boolean): void {
+        modal.webContents.send(modalManagerApi_onModalVisibilityChange, url, visible)
     }
 
     private getInitializedModal(url: string) {

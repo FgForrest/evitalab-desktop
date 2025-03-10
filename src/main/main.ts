@@ -10,7 +10,7 @@ import { ModalManager } from './modal/service/ModalManager'
 import { ConnectionId } from './connection/model/ConnectionId'
 import { Connection } from './connection/model/Connection'
 import {
-    connectionManagerApi_activateConnection,
+    connectionManagerApi_activateConnection, connectionManagerApi_addConnection,
     connectionManagerApi_connections
 } from '../preload/api/ConnectionManagerApi'
 import { modalManagerApi_closeModal, modalManagerApi_openModal } from '../preload/api/ModalManagerApi'
@@ -24,7 +24,7 @@ if (started) {
 
 const skeletonManager: SkeletonManager = new SkeletonManager()
 const modalManager: ModalManager = new ModalManager()
-const connectionManager: ConnectionManager = new ConnectionManager()
+const connectionManager: ConnectionManager = new ConnectionManager(skeletonManager, modalManager)
 const driverManager: DriverManager = new DriverManager()
 const instanceManager: InstanceManager = new InstanceManager(driverManager)
 
@@ -46,6 +46,10 @@ app.on('ready', async () => {
     ipcMain.on(
         connectionManagerApi_activateConnection,
         (event: IpcMainEvent, connectionId: ConnectionId | undefined) => { connectionManager.activateConnection(connectionId) }
+    )
+    ipcMain.on(
+        connectionManagerApi_addConnection,
+        (event: IpcMainEvent, connection: Connection) => { connectionManager.addConnection(connection) }
     )
     ipcMain.handle(
         connectionManagerApi_connections,

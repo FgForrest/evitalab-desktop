@@ -1,5 +1,5 @@
 /**
- * Initialize example modal
+ * Initialize navigation panel
  */
 
 import NavigationPanel from './NavigationPanel.vue'

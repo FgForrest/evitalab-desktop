@@ -8,17 +8,28 @@ import ConnectionAvatar from './ConnectionAvatar.vue'
 import { ref } from 'vue'
 import { ConnectionManagerApi } from '../../../preload/api/ConnectionManagerApi'
 import { ModalManagerApi } from '../../../preload/api/ModalManagerApi'
+import { ConnectionId } from '../../../main/connection/model/ConnectionId'
 
 //@ts-ignore
 const connectionManager: ConnectionManagerApi = window.connectionManager
 //@ts-ignore
 const modalManager: ModalManagerApi = window.modalManager
 
+const activatedConnections = ref<ConnectionId[]>([])
 const connections = ref<Connection[]>([])
 connectionManager.connections()
     .then((fetchedConnections: Connection[]) => connections.value = fetchedConnections)
 
-// todo lho hook on connection activatation
+connectionManager.onConnectionActivation((activated: Connection | undefined) => {
+    if (activated != undefined) {
+        activatedConnections.value = [activated.id]
+    } else {
+        activatedConnections.value = []
+    }
+})
+
+connectionManager.onConnectionsChange((newConnections: Connection[]) =>
+    connections.value = newConnections)
 
 function openNavigationPanel(): void {
     modalManager.openModal('/navigation-panel/navigation-panel.html')
@@ -39,6 +50,7 @@ function openNavigationPanel(): void {
         </template>
 
         <VList
+            :selected="activatedConnections"
             density="compact"
             nav
             class="connection-items"

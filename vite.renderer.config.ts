@@ -26,6 +26,7 @@ export default defineConfig({
             input: {
                 skeleton: resolve(__dirname, 'src/renderer/skeleton/skeleton.html'),
                 navigationPanel: resolve(__dirname, 'src/renderer/navigation-panel/navigation-panel.html'),
+                connectionEditor: resolve(__dirname, 'src/renderer/connection/editor/connection-editor.html'),
             }
         }
     },
