@@ -1,0 +1,88 @@
+import { ConnectionId } from '../../connection/model/ConnectionId'
+import { List } from 'immutable'
+import { app } from 'electron'
+import fs from 'node:fs/promises'
+import { EventEmitter } from 'events'
+import log from 'electron-log/main'
+
+/**
+ * Gets emitted when the app config gets updated with new data
+ */
+export const CONFIG_EMIT_UPDATE = 'update'
+
+/**
+ * Holds entire evitaLab user-specific configuration for running the app.
+ */
+export class AppConfig extends EventEmitter {
+
+    private _connections: List<ConnectionConfig> = List()
+    private _activeConnection: ConnectionId | undefined = undefined
+
+    async init(): Promise<void> {
+        try {
+            const storedConfig: string = await fs.readFile(this.configPath, 'utf-8')
+            if (storedConfig.length > 0) {
+                const parsedConfig: StorableConfig = JSON.parse(storedConfig) as StorableConfig
+                this._connections = List(parsedConfig.connections)
+                this._activeConnection = parsedConfig.activeConnection
+            }
+        } catch (e) {
+            log.error('Could not load stored app config: ', e.message)
+        }
+        this.emitUpdated()
+    }
+
+    get connections(): List<ConnectionConfig> {
+        return this._connections
+    }
+
+    async updateConnections(connections: List<ConnectionConfig>): Promise<void> {
+        this._connections = connections
+        await this.storeConfig()
+    }
+
+    get activeConnection(): ConnectionId | undefined {
+        return this._activeConnection
+    }
+
+    async updateActiveConnection(activeConnection: ConnectionId | undefined): Promise<void> {
+        this._activeConnection = activeConnection
+        await this.updated()
+    }
+
+    private async updated(): Promise<void> {
+        this.emitUpdated()
+        await this.storeConfig()
+    }
+
+    private async storeConfig(): Promise<void> {
+        const configToStore: StorableConfig = {
+            connections: this._connections.toArray(),
+            activeConnection: this._activeConnection
+        }
+        const serializedConfig: string = JSON.stringify(configToStore)
+        await fs.writeFile(this.configPath, serializedConfig, 'utf-8')
+        log.info('Updated app config stored.')
+    }
+
+    private emitUpdated() {
+        this.emit(CONFIG_EMIT_UPDATE, this)
+    }
+
+    private get configPath(): string {
+        return `${app.getPath('userData')}/config.json`
+    }
+}
+
+export interface ConnectionConfig {
+
+    readonly id: ConnectionId
+    readonly name: string
+    readonly serverUrl: string
+    readonly driverVersion: string
+}
+
+interface StorableConfig {
+    connections: ConnectionConfig[],
+    activeConnection: ConnectionId | undefined
+}

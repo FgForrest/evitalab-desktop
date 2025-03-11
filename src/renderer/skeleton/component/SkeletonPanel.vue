@@ -9,6 +9,8 @@ import { ref } from 'vue'
 import { ConnectionManagerApi } from '../../../preload/api/ConnectionManagerApi'
 import { ModalManagerApi } from '../../../preload/api/ModalManagerApi'
 import { ConnectionId } from '../../../main/connection/model/ConnectionId'
+import { NAVIGATION_PANEL_URL } from '../../navigation-panel/navigationPanelConstants'
+// import { NAVIGATION_PANEL_URL } from '../../navigation-panel/navigation-panel'
 
 //@ts-ignore
 const connectionManager: ConnectionManagerApi = window.connectionManager
@@ -32,7 +34,7 @@ connectionManager.onConnectionsChange((newConnections: Connection[]) =>
     connections.value = newConnections)
 
 function openNavigationPanel(): void {
-    modalManager.openModal('/navigation-panel/navigation-panel.html')
+    modalManager.openModal(NAVIGATION_PANEL_URL)
 }
 </script>
 

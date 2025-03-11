@@ -27,15 +27,39 @@ export class ModalManager {
 
     // todo lho nice urls like evitalab:navigation-panel ???
     async openModal(url: string): Promise<void> {
-        if (this.initializedModals.has(url)) {
-            this.showModal(url)
-        } else {
-            await this.initModal(url)
-        }
+        await this.initModal(url)
+        this.showModal(url)
     }
 
     closeModal(url: string): void {
         this.hideModal(url)
+    }
+
+    async initModal(url: string): Promise<void> {
+        if (this.initializedModals.has(url)) {
+            return
+        }
+        if (this._skeletonWindow == undefined) {
+            throw new Error('Skeleton is not initialized yet.')
+        }
+
+        const newModal: WebContentsView = new WebContentsView({
+            webPreferences: {
+                preload: path.join(__dirname, 'renderer-preload.js'),
+            },
+        })
+        newModal.setBackgroundColor('#00000000');
+        newModal.setBounds(this.constructViewBounds());
+        newModal.setVisible(false)
+        this._skeletonWindow.on('resize', () => newModal.setBounds(this.constructViewBounds()))
+        if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+            await newModal.webContents.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL + `/src/renderer${url}`);
+        } else {
+            await newModal.webContents.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}${url}`));
+        }
+
+        this._skeletonWindow.contentView.addChildView(newModal)
+        this.initializedModals.set(url, newModal)
     }
 
     private showModal(url: string): void {
@@ -50,30 +74,6 @@ export class ModalManager {
         const modal: WebContentsView = this.getInitializedModal(url)
         this.notifyModalVisibilityChange(modal, url, false)
         modal.setVisible(false)
-    }
-
-    private async initModal(url: string): Promise<void> {
-        if (this._skeletonWindow == undefined) {
-            throw new Error('Skeleton is not initialized yet.')
-        }
-
-        const newModal: WebContentsView = new WebContentsView({
-            webPreferences: {
-                preload: path.join(__dirname, 'renderer-preload.js'),
-            },
-        })
-        newModal.setBackgroundColor('#00000000');
-        newModal.setBounds(this.constructViewBounds());
-        this._skeletonWindow.on('resize', () => newModal.setBounds(this.constructViewBounds()))
-        if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-            await newModal.webContents.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL + `/src/renderer${url}`);
-        } else {
-            await newModal.webContents.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}${url}`));
-        }
-
-        this._skeletonWindow.contentView.addChildView(newModal)
-        this.notifyModalVisibilityChange(newModal, url, true)
-        this.initializedModals.set(url, newModal)
     }
 
     private notifyModalVisibilityChange(modal: WebContentsView, url: string, visible: boolean): void {

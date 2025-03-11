@@ -4,6 +4,9 @@ import { Connection } from '../../main/connection/model/Connection'
 import ConnectionAvatar from '../skeleton/component/ConnectionAvatar.vue'
 import { ConnectionManagerApi } from '../../preload/api/ConnectionManagerApi'
 import { ModalManagerApi } from '../../preload/api/ModalManagerApi'
+import { ConnectionId } from '../../main/connection/model/ConnectionId'
+import { CONNECTION_EDITOR_URL } from '../connection/editor/connectionEditorConstants'
+import { NAVIGATION_PANEL_URL } from './navigationPanelConstants'
 
 //@ts-ignore
 const connectionManager: ConnectionManagerApi = window.connectionManager
@@ -11,16 +14,24 @@ const connectionManager: ConnectionManagerApi = window.connectionManager
 const modalManager: ModalManagerApi = window.modalManager
 
 const shown = ref<boolean>(false)
+const activatedConnections = ref<ConnectionId[]>([])
 const connections = ref<Connection[]>([])
 connectionManager.connections()
     .then((fetchedConnections: Connection[]) => connections.value = fetchedConnections)
+
+connectionManager.onConnectionActivation((activated: Connection | undefined) => {
+    if (activated != undefined) {
+        activatedConnections.value = [activated.id]
+    } else {
+        activatedConnections.value = []
+    }
+})
 
 connectionManager.onConnectionsChange((newConnections: Connection[]) =>
     connections.value = newConnections)
 
 modalManager.onModalVisibilityChange((url: string, visible: boolean) => {
-    console.log(url, visible)
-    if (url !== '/navigation-panel/navigation-panel.html') {
+    if (url !== NAVIGATION_PANEL_URL) {
         return
     }
     if (visible === true) {
@@ -38,11 +49,11 @@ function selectConnection(item: any): void {
 
 function closeNavigationPanel(): void {
     shown.value = false // todo lho <-- doens't hide it nicely
-    modalManager.closeModal('/navigation-panel/navigation-panel.html')
+    modalManager.closeModal(NAVIGATION_PANEL_URL)
 }
 
 function addConnection(): void {
-    modalManager.openModal('/connection/editor/connection-editor.html')
+    modalManager.openModal(CONNECTION_EDITOR_URL)
 }
 
 </script>
@@ -60,6 +71,7 @@ function addConnection(): void {
             <VDivider/>
 
             <VList
+                :selected="activatedConnections"
                 density="compact"
                 nav
                 @click:select="selectConnection"

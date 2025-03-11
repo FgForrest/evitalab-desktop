@@ -1,34 +1,51 @@
 import { ConnectionId } from '../model/ConnectionId'
 import { Connection } from '../model/Connection'
 import { List } from 'immutable'
-import {
-    connectionManagerApi_onConnectionActivation,
-    connectionManagerApi_onConnectionsChange
-} from '../../../preload/api/ConnectionManagerApi'
-import { SkeletonManager } from '../../skeleton/service/SkeletonManager'
-import { ModalManager } from '../../modal/service/ModalManager'
+import { AppConfig } from '../../config/model/AppConfig'
+import { EventEmitter } from 'events'
+
+/**
+ * Gets emitted when a connection was activated.
+ */
+export const CONNECTION_MANAGER_EMIT_CONNECTION_ACTIVATION = 'connectionActivation'
+/**
+ * Gets emitted when the connection list was changed.
+ */
+export const CONNECTION_MANAGER_EMIT_CONNECTIONS_CHANGE = 'connectionChange'
 
 /**
  * Manages all evitaDB server connections. This is the main part of the desktop wrapper.
  */
-export class ConnectionManager {
+export class ConnectionManager extends EventEmitter {
 
-    private readonly skeletonManager: SkeletonManager
-    private readonly modalManager: ModalManager
+    private readonly appConfig: AppConfig
 
-    private readonly _connections: Map<ConnectionId, Connection>
-    private _activeConnection: ConnectionId | undefined
-    private readonly onActivateConnectionCallbacks: ((newConnection: Connection) => void)[] = []
+    private _connections: Map<ConnectionId, Connection> = new Map()
+    private _activeConnection: ConnectionId | undefined = undefined
 
-    constructor(skeletonManager: SkeletonManager,
-                modalManager: ModalManager) {
-        this.skeletonManager = skeletonManager
-        this.modalManager = modalManager
-        // todo lho temporary
-        this._connections = new Map([
-            ['con-1', new Connection('con-1', 'Connection 1', 'https://demo.evitadb.io:5555', '1')],
-            ['con-2', new Connection('con-2', 'Connection 2', 'https://demo.evitadb.io:5555', '1')]
-        ]);
+    constructor(appConfig: AppConfig) {
+        super()
+        this.appConfig = appConfig
+    }
+
+    init(): void {
+        if (!this.appConfig.connections.isEmpty()) {
+            this._connections = new Map(
+                this.appConfig.connections
+                    .map(connectionConfig => {
+                        return [
+                            connectionConfig.id,
+                            new Connection(connectionConfig.id, connectionConfig.name, connectionConfig.serverUrl, connectionConfig.driverVersion)
+                        ] as [ConnectionId, Connection]
+                    })
+                    .toArray()
+            )
+            this.notifyConnectionsChange()
+        }
+        if (this.appConfig.activeConnection != undefined) {
+            this._activeConnection = this.appConfig.activeConnection
+            this.notifyConnectionActivated()
+        }
     }
 
     get activeConnection(): Connection | undefined {
@@ -42,45 +59,61 @@ export class ConnectionManager {
         return List(Array.from(this._connections.values()))
     }
 
-    activateConnection(connectionId: ConnectionId | undefined): void {
+    async activateConnection(connectionId: ConnectionId | undefined): Promise<void> {
         if (connectionId != undefined && !this._connections.has(connectionId)) {
             throw new Error(`Cannot activate connection ${connectionId}, it doesn't exist.`)
         }
         this._activeConnection = connectionId
+
+        await this.updateActiveConnectionConfig()
         this.notifyConnectionActivated()
     }
 
-    addOnActivateConnectionCallback(callback: (newConnection: Connection | undefined) => void): void {
-        this.onActivateConnectionCallbacks.push(callback)
-    }
-
-    addConnection(connection: Connection): void {
+    async addConnection(connection: Connection): Promise<void> {
         if (this._connections.has(connection.id)) {
             throw new Error(`Connection ${connection.id} already exists.`);
         }
         this._connections.set(connection.id, connection);
+
+        await this.updateConnectionsConfig()
         this.notifyConnectionsChange()
     }
 
-    removeConnection(connectionId: ConnectionId): void {
+    async removeConnection(connectionId: ConnectionId): Promise<void> {
+        if (this._activeConnection === connectionId) {
+            this._activeConnection = undefined
+        }
         this._connections.delete(connectionId);
+
+        await this.updateActiveConnectionConfig()
+        await this.updateConnectionsConfig()
         this.notifyConnectionsChange()
+    }
+
+    private updateActiveConnectionConfig(): Promise<void> {
+        return this.appConfig.updateActiveConnection(this._activeConnection)
+    }
+
+    private updateConnectionsConfig(): Promise<void> {
+        return this.appConfig.updateConnections(
+            this.connections.map(connection => {
+                return {
+                    id: connection.id,
+                    name: connection.name,
+                    serverUrl: connection.serverUrl,
+                    driverVersion: connection.driverVersion
+                }
+            })
+        )
     }
 
     private notifyConnectionActivated(): void {
         const activatedConnection: Connection | undefined = this.activeConnection
-
-        this.onActivateConnectionCallbacks.forEach(callback => callback(activatedConnection))
-
-        this.skeletonManager.skeletonWindow.webContents.send(connectionManagerApi_onConnectionActivation, activatedConnection)
-        this.modalManager.modals.forEach(modal =>
-            modal.webContents.send(connectionManagerApi_onConnectionActivation, activatedConnection))
+        this.emit(CONNECTION_MANAGER_EMIT_CONNECTION_ACTIVATION, activatedConnection)
     }
 
     private notifyConnectionsChange(): void {
         const connections: Connection[] = this.connections.toArray()
-        this.skeletonManager.skeletonWindow.webContents.send(connectionManagerApi_onConnectionsChange, connections)
-        this.modalManager.modals.forEach(modal =>
-            modal.webContents.send(connectionManagerApi_onConnectionsChange, connections))
+        this.emit(CONNECTION_MANAGER_EMIT_CONNECTIONS_CHANGE, connections)
     }
 }

@@ -3,6 +3,7 @@ import { ModalManagerApi } from '../../../preload/api/ModalManagerApi'
 import { ConnectionManagerApi } from '../../../preload/api/ConnectionManagerApi'
 import { ref } from 'vue'
 import { Connection } from '../../../main/connection/model/Connection'
+import { CONNECTION_EDITOR_URL } from './connectionEditorConstants'
 
 //@ts-ignore
 const connectionManager: ConnectionManagerApi = window.connectionManager
@@ -34,7 +35,7 @@ function cancel(): void {
 }
 
 function close(): void {
-    modalManager.closeModal('/connection/editor/connection-editor.html')
+    modalManager.closeModal(CONNECTION_EDITOR_URL)
 }
 </script>
 
