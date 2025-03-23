@@ -19,6 +19,8 @@ import { Connection } from '../../../connection/model/Connection'
 import WebContents = Electron.WebContents
 import { SkeletonManager } from '../../../skeleton/service/SkeletonManager'
 import { ModalManager } from '../../../modal/service/ModalManager'
+import { ConnectionStyling } from '../../../connection/model/ConnectionStyling'
+import { ConnectionStylingDto } from '../../../../common/ipc/connection/model/ConnectionStylingDto'
 
 /**
  * Implementation of connection manager IPC for backend.
@@ -56,7 +58,11 @@ export function initBackendConnectionManagerIpc(skeletonManager: SkeletonManager
                     undefined,
                     connectionDto.name,
                     connectionDto.serverUrl,
-                    connectionDto.driverVersion
+                    connectionDto.driverVersion,
+                    new ConnectionStyling(
+                        connectionDto.styling.shortName,
+                        connectionDto.styling.color
+                    )
                 ))
             } else {
                 const existingConnection: Connection | undefined = connectionManager.getConnection(connectionDto.id)
@@ -66,7 +72,11 @@ export function initBackendConnectionManagerIpc(skeletonManager: SkeletonManager
                 existingConnection.update(
                     connectionDto.name,
                     connectionDto.serverUrl,
-                    connectionDto.driverVersion
+                    connectionDto.driverVersion,
+                    new ConnectionStyling(
+                        connectionDto.styling.shortName,
+                        connectionDto.styling.color
+                    )
                 )
                 connectionManager.storeConnection(existingConnection)
             }
@@ -134,6 +144,10 @@ function convertConnectionToDto(connection: Connection): ConnectionDto {
         id: connection.id,
         name: connection.name,
         serverUrl: connection.serverUrl,
-        driverVersion: connection.driverVersion
+        driverVersion: connection.driverVersion,
+        styling: {
+            shortName: connection.styling.shortName,
+            color: connection.styling.color
+        } as ConnectionStylingDto
     } as ConnectionDto
 }

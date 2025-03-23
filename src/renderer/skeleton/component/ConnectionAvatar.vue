@@ -2,25 +2,23 @@
 
 import { computed } from 'vue'
 import { ConnectionDto } from '../../../common/ipc/connection/model/ConnectionDto'
+import { computeShortConnectionName } from '../../../common/utils/connection'
 
 const props = defineProps<{
     connection: ConnectionDto
 }>()
 
-const initials = computed<string>(() => {
-    const parts: string[] = props.connection.name.split(/\s+/)
-    if (parts.length > 3) {
-        return parts.slice(0, 2).map(part => part.substring(0, 1).toUpperCase()).join('') +
-            parts.at(-1).substring(0, 1).toUpperCase()
-    } else {
-        return parts.map(part => part.substring(0, 1).toUpperCase()).join('')
+const shortName = computed<string>(() => {
+    if (props.connection.styling.shortName != undefined) {
+        return props.connection.styling.shortName
     }
+    return computeShortConnectionName(props.connection.name)
 })
 </script>
 
 <template>
-    <VAvatar size="large">
-        <span>{{ initials }}</span>
+    <VAvatar size="large" :color="connection.styling.color">
+        <span>{{ shortName }}</span>
     </VAvatar>
 </template>
 

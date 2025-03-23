@@ -80,6 +80,14 @@ export interface ConnectionConfig {
     readonly name: string
     readonly serverUrl: string
     readonly driverVersion: string
+
+    readonly styling: ConnectionStylingConfig
+}
+
+export interface ConnectionStylingConfig {
+
+    readonly shortName: string | undefined
+    readonly color: string | undefined
 }
 
 interface StorableConfig {

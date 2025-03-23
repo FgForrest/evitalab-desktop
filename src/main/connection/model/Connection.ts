@@ -1,5 +1,6 @@
 import { ConnectionId } from './ConnectionId'
 import XXH, { HashObject } from 'xxhashjs'
+import { ConnectionStyling } from './ConnectionStyling'
 
 const hasher: HashObject = XXH.h64()
 
@@ -13,20 +14,26 @@ export class Connection {
     serverUrl: string
     driverVersion: string
 
+    readonly styling: ConnectionStyling
+
     constructor(id: ConnectionId | undefined,
                 name: string,
                 serverUrl: string,
-                driverVersion: string) {
+                driverVersion: string,
+                styling: ConnectionStyling) {
         this.id = id ? id : hasher.update(name).digest().toString(16)
         this.name = name
         this.serverUrl = this.validateAndNormalizeUrl(serverUrl)
         this.driverVersion = driverVersion
+        this.styling = styling
     }
 
-    update(name: string, serverUrl: string, driverVersion: string): void {
+    update(name: string, serverUrl: string, driverVersion: string, styling: ConnectionStyling): void {
         this.name = name
         this.serverUrl = serverUrl
         this.driverVersion = driverVersion
+        this.styling.shortName = styling.shortName
+        this.styling.color = styling.color
     }
 
     private validateAndNormalizeUrl(url: string): string {

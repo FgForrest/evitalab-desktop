@@ -7,6 +7,7 @@ import {
 } from '../../../preload/renderer/ipc/connection/service/FrontendConnectionManagerIpc'
 import { FrontendModalManagerIpc } from '../../../preload/renderer/ipc/modal/service/FrontendModalManagerIpc'
 import { ConnectionDto } from '../../../common/ipc/connection/model/ConnectionDto'
+import { computeShortConnectionName } from '../../../common/utils/connection'
 
 //@ts-ignore
 const connectionManager: FrontendConnectionManagerIpc = window.connectionManager
@@ -17,6 +18,9 @@ const connectionId = ref<ConnectionId | undefined>(undefined)
 const connectionName = ref<string>('')
 const serverUrl = ref<string>('')
 const driverVersion = ref<string>('1')
+const customShortConnectionName = ref<string>('')
+const computedShortConnectionName = computed<string>(() => computeShortConnectionName(connectionName.value))
+const color = ref<string | undefined>(undefined)
 
 const isNew = computed<boolean>(() => connectionId.value == undefined)
 
@@ -40,6 +44,8 @@ modalManager.onModalArgsPassed(async (url: string, args: any[]) => {
     connectionName.value = existingConnection.name
     serverUrl.value = existingConnection.serverUrl
     driverVersion.value = existingConnection.driverVersion
+    customShortConnectionName.value = existingConnection.styling.shortName == undefined ? '' : existingConnection.styling.shortName
+    color.value = existingConnection.styling.color == undefined ? '' : existingConnection.styling.color
 })
 
 function reset(): void {
@@ -47,15 +53,28 @@ function reset(): void {
     connectionName.value = ''
     serverUrl.value = ''
     driverVersion.value = '1'
+    customShortConnectionName.value = ''
+    color.value = ''
 }
 
 async function save(): Promise<void> {
+    const finalShortConnectionName: string | undefined = customShortConnectionName.value == undefined || customShortConnectionName.value.length === 0
+        ? undefined
+        : customShortConnectionName.value
+    const finalColor: string | undefined = color.value == undefined || color.value.length === 0
+        ? undefined
+        : color.value
+
     if (isNew.value) {
         connectionManager.storeConnection({
             id: undefined,
             name: connectionName.value,
             serverUrl: serverUrl.value,
-            driverVersion: '1'
+            driverVersion: '1',
+            styling: {
+                shortName: finalShortConnectionName,
+                color: finalColor
+            }
         })
     } else {
         const existingConnection: ConnectionDto | undefined = await connectionManager.getConnection(connectionId.value)
@@ -65,6 +84,8 @@ async function save(): Promise<void> {
         existingConnection.name = connectionName.value
         existingConnection.serverUrl = serverUrl.value
         existingConnection.driverVersion = driverVersion.value
+        existingConnection.styling.shortName = finalShortConnectionName
+        existingConnection.styling.color = finalColor
         connectionManager.storeConnection(existingConnection)
     }
     close()
@@ -102,9 +123,36 @@ function close(): void {
                             label="Connection name"
                         />
                         <VTextField
+                            v-model="customShortConnectionName"
+                            :placeholder="computedShortConnectionName"
+                            :persistent-placeholder="computedShortConnectionName.length > 0"
+                            label="Short connection name"
+                        />
+                        <VTextField
                             v-model="serverUrl"
                             label="Server URL"
                         />
+                        <VMenu>
+                            <template #activator="{ props }">
+                                <VBtn v-bind="props">
+                                    <template #prepend>
+                                        <VAvatar :color="color" size="16"/>
+                                    </template>
+                                    <span>
+                                        Color
+                                    </span>
+                                </VBtn>
+                            </template>
+
+                            <template #default>
+                                <VColorPicker
+                                    v-model="color"
+                                    hide-canvas
+                                    hide-inputs
+                                    show-swatches
+                                />
+                            </template>
+                        </VMenu>
                     </VForm>
                 </VCardText>
 

@@ -3,6 +3,7 @@ import { Connection } from '../model/Connection'
 import { List } from 'immutable'
 import { AppConfig } from '../../config/model/AppConfig'
 import { EventEmitter } from 'events'
+import { ConnectionStyling } from '../model/ConnectionStyling'
 
 /**
  * Gets emitted when a connection was activated.
@@ -41,7 +42,11 @@ export class ConnectionManager extends EventEmitter {
                             connectionConfig.id,
                             connectionConfig.name,
                             connectionConfig.serverUrl,
-                            connectionConfig.driverVersion
+                            connectionConfig.driverVersion,
+                            new ConnectionStyling(
+                                connectionConfig.styling.shortName,
+                                connectionConfig.styling.color
+                            )
                         )
                         return [connectionConfig.id, connection] as [ConnectionId, Connection]
                     })
@@ -129,7 +134,11 @@ export class ConnectionManager extends EventEmitter {
                     id: connection.id,
                     name: connection.name,
                     serverUrl: connection.serverUrl,
-                    driverVersion: connection.driverVersion
+                    driverVersion: connection.driverVersion,
+                    styling: {
+                        shortName: connection.styling.shortName,
+                        color: connection.styling.color
+                    }
                 }
             })
         )
