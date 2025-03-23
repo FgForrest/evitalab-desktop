@@ -30,10 +30,21 @@ export class InstanceManager {
     }
 
     async activateInstance(connection: Connection | undefined): Promise<void> {
-        if (connection == undefined || this.instances.has(connection.id)) {
-            this.showInstance(connection)
-        } else {
+        if (connection != undefined && !this.instances.has(connection.id)) {
             await this.initInstance(connection)
+        }
+        this.showInstance(connection)
+    }
+
+    async restartInstance(connection: Connection): Promise<void> {
+        if (!this.instances.has(connection.id)) {
+            return
+        }
+
+        this.destroyInstance(connection)
+        await this.initInstance(connection)
+        if (this.activeInstance === connection.id) {
+            this.showInstance(connection)
         }
     }
 
@@ -65,14 +76,19 @@ export class InstanceManager {
             },
         })
         instance.setBounds(this.constructViewBounds());
+        instance.setVisible(false)
         this._skeletonWindow.on('resize', () => instance.setBounds(this.constructViewBounds()))
         await instance.webContents.loadFile(driver.url, this.constructInstanceUrlOptions(connection))
 
-        this.hideActiveInstance()
-
         this._skeletonWindow.contentView.addChildView(instance, 0) // adding it under every modal window
         this.instances.set(connection.id, instance)
-        this.activeInstance = connection.id
+    }
+
+    private destroyInstance(connection: Connection): void {
+        if (!this.instances.has(connection.id)) {
+            return
+        }
+        this._skeletonWindow.contentView.removeChildView(this.instances.get(connection.id))
     }
 
     private hideActiveInstance() {

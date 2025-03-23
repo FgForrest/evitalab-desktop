@@ -3,26 +3,27 @@
  * Main lab panel with navigation and useful links
  */
 
-import { Connection } from '../../../main/connection/model/Connection'
 import ConnectionAvatar from './ConnectionAvatar.vue'
 import { ref } from 'vue'
-import { ConnectionManagerApi } from '../../../preload/api/ConnectionManagerApi'
-import { ModalManagerApi } from '../../../preload/api/ModalManagerApi'
 import { ConnectionId } from '../../../main/connection/model/ConnectionId'
 import { NAVIGATION_PANEL_URL } from '../../navigation-panel/navigationPanelConstants'
-// import { NAVIGATION_PANEL_URL } from '../../navigation-panel/navigation-panel'
+import {
+    FrontendConnectionManagerIpc
+} from '../../../preload/renderer/ipc/connection/service/FrontendConnectionManagerIpc'
+import { FrontendModalManagerIpc } from '../../../preload/renderer/ipc/modal/service/FrontendModalManagerIpc'
+import { ConnectionDto } from '../../../common/ipc/connection/model/ConnectionDto'
 
 //@ts-ignore
-const connectionManager: ConnectionManagerApi = window.connectionManager
+const connectionManager: FrontendConnectionManagerIpc = window.connectionManager
 //@ts-ignore
-const modalManager: ModalManagerApi = window.modalManager
+const modalManager: FrontendModalManagerIpc = window.modalManager
 
 const activatedConnections = ref<ConnectionId[]>([])
-const connections = ref<Connection[]>([])
-connectionManager.connections()
-    .then((fetchedConnections: Connection[]) => connections.value = fetchedConnections)
+const connections = ref<ConnectionDto[]>([])
+connectionManager.getConnections()
+    .then((fetchedConnections: ConnectionDto[]) => connections.value = fetchedConnections)
 
-connectionManager.onConnectionActivation((activated: Connection | undefined) => {
+connectionManager.onConnectionActivation((activated: ConnectionDto | undefined) => {
     if (activated != undefined) {
         activatedConnections.value = [activated.id]
     } else {
@@ -30,7 +31,7 @@ connectionManager.onConnectionActivation((activated: Connection | undefined) => 
     }
 })
 
-connectionManager.onConnectionsChange((newConnections: Connection[]) =>
+connectionManager.onConnectionsChange((newConnections: ConnectionDto[]) =>
     connections.value = newConnections)
 
 function openNavigationPanel(): void {

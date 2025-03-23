@@ -23,6 +23,12 @@ export class Connection {
         this.driverVersion = driverVersion
     }
 
+    update(name: string, serverUrl: string, driverVersion: string): void {
+        this.name = name
+        this.serverUrl = serverUrl
+        this.driverVersion = driverVersion
+    }
+
     private validateAndNormalizeUrl(url: string): string {
         try {
             new URL(url)

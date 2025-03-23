@@ -9,9 +9,13 @@ import { EventEmitter } from 'events'
  */
 export const CONNECTION_MANAGER_EMIT_CONNECTION_ACTIVATION = 'connectionActivation'
 /**
+ * Gets emitted when a connection was created or changed.
+ */
+export const CONNECTION_MANAGER_EMIT_CONNECTION_CHANGE = 'connectionChange'
+/**
  * Gets emitted when the connection list was changed.
  */
-export const CONNECTION_MANAGER_EMIT_CONNECTIONS_CHANGE = 'connectionChange'
+export const CONNECTION_MANAGER_EMIT_CONNECTIONS_CHANGE = 'connectionsChange'
 
 /**
  * Manages all evitaDB server connections. This is the main part of the desktop wrapper.
@@ -33,10 +37,13 @@ export class ConnectionManager extends EventEmitter {
             this._connections = new Map(
                 this.appConfig.connections
                     .map(connectionConfig => {
-                        return [
+                        const connection: Connection = new Connection(
                             connectionConfig.id,
-                            new Connection(connectionConfig.id, connectionConfig.name, connectionConfig.serverUrl, connectionConfig.driverVersion)
-                        ] as [ConnectionId, Connection]
+                            connectionConfig.name,
+                            connectionConfig.serverUrl,
+                            connectionConfig.driverVersion
+                        )
+                        return [connectionConfig.id, connection] as [ConnectionId, Connection]
                     })
                     .toArray()
             )
@@ -59,6 +66,10 @@ export class ConnectionManager extends EventEmitter {
         return List(Array.from(this._connections.values()))
     }
 
+    getConnection(connectionId: ConnectionId): Connection | undefined {
+        return this._connections.get(connectionId)
+    }
+
     async activateConnection(connectionId: ConnectionId | undefined): Promise<void> {
         if (connectionId != undefined && !this._connections.has(connectionId)) {
             throw new Error(`Cannot activate connection ${connectionId}, it doesn't exist.`)
@@ -69,19 +80,17 @@ export class ConnectionManager extends EventEmitter {
         this.notifyConnectionActivated()
     }
 
-    async addConnection(connection: Connection): Promise<void> {
-        if (this._connections.has(connection.id)) {
-            throw new Error(`Connection ${connection.id} already exists.`);
-        }
+    async storeConnection(connection: Connection): Promise<void> {
         this._connections.set(connection.id, connection);
 
         await this.updateConnectionsConfig()
+        this.notifyConnectionChange(connection)
         this.notifyConnectionsChange()
     }
 
     async removeConnection(connectionId: ConnectionId): Promise<void> {
         if (this._activeConnection === connectionId) {
-            this._activeConnection = undefined
+            await this.activateConnection(undefined)
         }
         this._connections.delete(connectionId);
 
@@ -110,6 +119,10 @@ export class ConnectionManager extends EventEmitter {
     private notifyConnectionActivated(): void {
         const activatedConnection: Connection | undefined = this.activeConnection
         this.emit(CONNECTION_MANAGER_EMIT_CONNECTION_ACTIVATION, activatedConnection)
+    }
+
+    private notifyConnectionChange(connection: Connection): void {
+        this.emit(CONNECTION_MANAGER_EMIT_CONNECTION_CHANGE, connection)
     }
 
     private notifyConnectionsChange(): void {

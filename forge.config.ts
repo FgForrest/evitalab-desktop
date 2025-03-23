@@ -30,12 +30,12 @@ const config: ForgeConfig = {
                     target: 'main'
                 },
                 {
-                    entry: 'src/preload/renderer-preload.ts',
+                    entry: 'src/preload/renderer/preload.ts',
                     config: 'vite.preload.config.ts',
                     target: 'preload'
                 },
                 {
-                    entry: 'src/preload/driver-preload.ts',
+                    entry: 'src/preload/driver/preload.ts',
                     config: 'vite.preload.config.ts',
                     target: 'preload'
                 }

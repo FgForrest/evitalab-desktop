@@ -1,10 +1,10 @@
 <script setup lang="ts">
 
-import { Connection } from '../../../main/connection/model/Connection'
 import { computed } from 'vue'
+import { ConnectionDto } from '../../../common/ipc/connection/model/ConnectionDto'
 
 const props = defineProps<{
-    connection: Connection
+    connection: ConnectionDto
 }>()
 
 const initials = computed<string>(() => {

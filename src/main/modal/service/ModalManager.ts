@@ -1,19 +1,30 @@
 import { BrowserWindow, WebContentsView } from 'electron'
 import path from 'path'
 import Rectangle = Electron.Rectangle
-import { modalManagerApi_onModalVisibilityChange } from '../../../preload/api/ModalManagerApi'
 import { List } from 'immutable'
+import { EventEmitter } from 'events'
+
+/**
+ * Gets emitted when a modal is being passed args.
+ */
+export const MODAL_MANAGER_EMIT_MODAL_ARGS_PASS = 'modalArgsPass'
+
+/**
+ * Gets emitted when a modal changed its visibility.
+ */
+export const MODAL_MANAGER_EMIT_MODAL_VISIBILITY_CHANGE = 'modalVisibilityChange'
 
 /**
  * Manages opening and closing modals
  */
-export class ModalManager {
+export class ModalManager extends EventEmitter {
 
     private _skeletonWindow: BrowserWindow | undefined = undefined
 
     private readonly initializedModals: Map<string, WebContentsView>
 
     constructor() {
+        super()
         this.initializedModals = new Map()
     }
 
@@ -26,9 +37,9 @@ export class ModalManager {
     }
 
     // todo lho nice urls like evitalab:navigation-panel ???
-    async openModal(url: string): Promise<void> {
+    async openModal(url: string, args: any[]): Promise<void> {
         await this.initModal(url)
-        this.showModal(url)
+        this.showModal(url, args)
     }
 
     closeModal(url: string): void {
@@ -62,10 +73,16 @@ export class ModalManager {
         this.initializedModals.set(url, newModal)
     }
 
-    private showModal(url: string): void {
+    private showModal(url: string, args: any[]): void {
         const modal: WebContentsView = this.getInitializedModal(url)
+
+        // pass arguments before the modal is shown
+        this.emit(MODAL_MANAGER_EMIT_MODAL_ARGS_PASS, modal, [url, ...args])
+
         // rearranges the existing child view to be the top most child
         this._skeletonWindow.contentView.addChildView(modal)
+
+        // show the modal
         this.notifyModalVisibilityChange(modal, url, true)
         modal.setVisible(true)
     }
@@ -77,7 +94,7 @@ export class ModalManager {
     }
 
     private notifyModalVisibilityChange(modal: WebContentsView, url: string, visible: boolean): void {
-        modal.webContents.send(modalManagerApi_onModalVisibilityChange, url, visible)
+        this.emit(MODAL_MANAGER_EMIT_MODAL_VISIBILITY_CHANGE, modal, url, visible)
     }
 
     private getInitializedModal(url: string) {

@@ -1,25 +1,25 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Connection } from '../../main/connection/model/Connection'
 import ConnectionAvatar from '../skeleton/component/ConnectionAvatar.vue'
-import { ConnectionManagerApi } from '../../preload/api/ConnectionManagerApi'
-import { ModalManagerApi } from '../../preload/api/ModalManagerApi'
 import { ConnectionId } from '../../main/connection/model/ConnectionId'
 import { CONNECTION_EDITOR_URL } from '../connection/editor/connectionEditorConstants'
 import { NAVIGATION_PANEL_URL } from './navigationPanelConstants'
+import { FrontendConnectionManagerIpc } from '../../preload/renderer/ipc/connection/service/FrontendConnectionManagerIpc'
+import { FrontendModalManagerIpc } from '../../preload/renderer/ipc/modal/service/FrontendModalManagerIpc'
+import { ConnectionDto } from '../../common/ipc/connection/model/ConnectionDto'
 
 //@ts-ignore
-const connectionManager: ConnectionManagerApi = window.connectionManager
+const connectionManager: FrontendConnectionManagerIpc = window.connectionManager
 //@ts-ignore
-const modalManager: ModalManagerApi = window.modalManager
+const modalManager: FrontendModalManagerIpc = window.modalManager
 
 const shown = ref<boolean>(false)
 const activatedConnections = ref<ConnectionId[]>([])
-const connections = ref<Connection[]>([])
-connectionManager.connections()
-    .then((fetchedConnections: Connection[]) => connections.value = fetchedConnections)
+const connections = ref<ConnectionDto[]>([])
+connectionManager.getConnections()
+    .then((fetchedConnections: ConnectionDto[]) => connections.value = fetchedConnections)
 
-connectionManager.onConnectionActivation((activated: Connection | undefined) => {
+connectionManager.onConnectionActivation((activated: ConnectionDto | undefined) => {
     if (activated != undefined) {
         activatedConnections.value = [activated.id]
     } else {
@@ -27,7 +27,7 @@ connectionManager.onConnectionActivation((activated: Connection | undefined) => 
     }
 })
 
-connectionManager.onConnectionsChange((newConnections: Connection[]) =>
+connectionManager.onConnectionsChange((newConnections: ConnectionDto[]) =>
     connections.value = newConnections)
 
 modalManager.onModalVisibilityChange((url: string, visible: boolean) => {
@@ -54,6 +54,15 @@ function closeNavigationPanel(): void {
 
 function addConnection(): void {
     modalManager.openModal(CONNECTION_EDITOR_URL)
+}
+
+function editConnection(connectionId: ConnectionId): void {
+    modalManager.openModal(CONNECTION_EDITOR_URL, connectionId)
+}
+
+function deleteConnection(connectionId: ConnectionId): void {
+    // todo lho confirmation modal
+    connectionManager.removeConnection(connectionId)
 }
 
 </script>
@@ -84,6 +93,15 @@ function addConnection(): void {
 
                     <template #title>
                         {{ connection.name }}
+                    </template>
+
+                    <template #append>
+                        <VBtn icon @click.stop="editConnection(connection.id)">
+                            <VIcon>mdi-pencil</VIcon>
+                        </VBtn>
+                        <VBtn icon @click.stop="deleteConnection(connection.id)">
+                            <VIcon>mdi-close</VIcon>
+                        </VBtn>
                     </template>
                 </VListItem>
             </VList>
