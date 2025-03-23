@@ -12,7 +12,7 @@ import {
     connectionManagerIpc_onConnectionActivation,
     connectionManagerIpc_onConnectionsChange,
     connectionManagerIpc_removeConnection,
-    connectionManagerIpc_storeConnection
+    connectionManagerIpc_storeConnection, connectionManagerIpc_storeConnectionsOrder
 } from '../../../../common/ipc/connection/service/ConnectionManagerIpc'
 import { ConnectionDto } from '../../../../common/ipc/connection/model/ConnectionDto'
 import { Connection } from '../../../connection/model/Connection'
@@ -70,6 +70,12 @@ export function initBackendConnectionManagerIpc(skeletonManager: SkeletonManager
                 )
                 connectionManager.storeConnection(existingConnection)
             }
+        }
+    )
+    ipcMain.on(
+        connectionManagerIpc_storeConnectionsOrder,
+        (event: IpcMainEvent, newOrder: ConnectionId[]) => {
+            connectionManager.storeConnectionsOrder(newOrder)
         }
     )
     ipcMain.on(

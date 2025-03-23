@@ -1,5 +1,6 @@
 export const connectionManagerIpc_activateConnection = 'connectionManager:activateConnection'
 export const connectionManagerIpc_storeConnection = 'connectionManager:storeConnection'
+export const connectionManagerIpc_storeConnectionsOrder = 'connectionManager:storeConnectionsOrder'
 export const connectionManagerIpc_removeConnection = 'connectionManager:removeConnection'
 
 export const connectionManagerIpc_getConnections = 'connectionManager:getConnections'

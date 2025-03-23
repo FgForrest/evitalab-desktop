@@ -7,6 +7,7 @@ import { NAVIGATION_PANEL_URL } from './navigationPanelConstants'
 import { FrontendConnectionManagerIpc } from '../../preload/renderer/ipc/connection/service/FrontendConnectionManagerIpc'
 import { FrontendModalManagerIpc } from '../../preload/renderer/ipc/modal/service/FrontendModalManagerIpc'
 import { ConnectionDto } from '../../common/ipc/connection/model/ConnectionDto'
+import draggable from 'vuedraggable'
 
 //@ts-ignore
 const connectionManager: FrontendConnectionManagerIpc = window.connectionManager
@@ -65,6 +66,10 @@ function deleteConnection(connectionId: ConnectionId): void {
     connectionManager.removeConnection(connectionId)
 }
 
+function storeConnectionsOrder(): void {
+    connectionManager.storeConnectionsOrder(connections.value.map(it => it.id))
+}
+
 </script>
 
 <template>
@@ -86,24 +91,34 @@ function deleteConnection(connectionId: ConnectionId): void {
                 @click:select="selectConnection"
                 class="connection-items"
             >
-                <VListItem v-for="connection in connections" :key="connection.id" :value="connection.id">
-                    <template #prepend>
-                        <ConnectionAvatar :connection="connection" />
+                <draggable
+                    v-model="connections"
+                    group="connections"
+                    item-key="id"
+                    @end="storeConnectionsOrder"
+                >
+                    <template #item="{ element }">
+                        <VListItem :value="(element as ConnectionDto).id">
+                            <template #prepend>
+                                <ConnectionAvatar :connection="element" />
+                            </template>
+
+                            <template #title>
+                                {{ (element as ConnectionDto).name }}
+                            </template>
+
+                            <template #append>
+                                <VBtn icon @click.stop="editConnection((element as ConnectionDto).id)">
+                                    <VIcon>mdi-pencil</VIcon>
+                                </VBtn>
+                                <VBtn icon @click.stop="deleteConnection((element as ConnectionDto).id)">
+                                    <VIcon>mdi-close</VIcon>
+                                </VBtn>
+                            </template>
+                        </VListItem>
                     </template>
 
-                    <template #title>
-                        {{ connection.name }}
-                    </template>
-
-                    <template #append>
-                        <VBtn icon @click.stop="editConnection(connection.id)">
-                            <VIcon>mdi-pencil</VIcon>
-                        </VBtn>
-                        <VBtn icon @click.stop="deleteConnection(connection.id)">
-                            <VIcon>mdi-close</VIcon>
-                        </VBtn>
-                    </template>
-                </VListItem>
+                </draggable>
             </VList>
 
             <VBtn @click="addConnection">

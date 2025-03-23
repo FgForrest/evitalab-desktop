@@ -8,7 +8,7 @@ import {
     connectionManagerIpc_onConnectionActivation,
     connectionManagerIpc_onConnectionsChange,
     connectionManagerIpc_removeConnection,
-    connectionManagerIpc_storeConnection
+    connectionManagerIpc_storeConnection, connectionManagerIpc_storeConnectionsOrder
 } from '../../../../../common/ipc/connection/service/ConnectionManagerIpc'
 
 /**
@@ -17,6 +17,7 @@ import {
 export type FrontendConnectionManagerIpc = {
     activateConnection(connectionId: ConnectionId | undefined): void,
     storeConnection(connection: ConnectionDto): void,
+    storeConnectionsOrder(newOrder: ConnectionId[]): void,
     removeConnection(connectionId: ConnectionId): void,
     getConnections(): Promise<ConnectionDto[]>,
     getConnection(connectionId: ConnectionId): Promise<ConnectionDto | undefined>,
@@ -34,6 +35,9 @@ export function exposeFrontendConnectionManagerIpc(): void {
         },
         storeConnection(connection: ConnectionDto): void {
             ipcRenderer.send(connectionManagerIpc_storeConnection, connection)
+        },
+        storeConnectionsOrder(newOrder: ConnectionId[]): void {
+            ipcRenderer.send(connectionManagerIpc_storeConnectionsOrder, newOrder)
         },
         removeConnection(connectionId: ConnectionId): void {
             ipcRenderer.send(connectionManagerIpc_removeConnection, connectionId)

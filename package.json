@@ -49,6 +49,7 @@
     "immutable": "^5.0.3",
     "vue": "^3.5.13",
     "vue-i18n": "^11.0.1",
+    "vuedraggable": "^4.1.0",
     "xxhashjs": "^0.2.2"
   }
 }

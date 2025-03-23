@@ -88,6 +88,25 @@ export class ConnectionManager extends EventEmitter {
         this.notifyConnectionsChange()
     }
 
+    async storeConnectionsOrder(newOrder: ConnectionId[]): Promise<void> {
+        if (newOrder.length != this._connections.size) {
+            throw new Error('Cannot reorder connections, sorted list doesn\'t contains same connections')
+        }
+
+        const sortedConnections: Map<ConnectionId, Connection> = new Map()
+        for (const connectionId of newOrder) {
+            const connection: Connection = this._connections.get(connectionId)
+            if (connection == undefined) {
+                throw new Error(`Sorted connection '${connectionId}' doesn't exist.`)
+            }
+            sortedConnections.set(connectionId, connection)
+        }
+        this._connections = sortedConnections
+
+        await this.updateConnectionsConfig()
+        this.notifyConnectionsChange()
+    }
+
     async removeConnection(connectionId: ConnectionId): Promise<void> {
         if (this._activeConnection === connectionId) {
             await this.activateConnection(undefined)
