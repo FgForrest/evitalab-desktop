@@ -7,7 +7,7 @@ import {
 /**
  * Interface of modal manager IPC for frontend renderer
  */
-export type FrontendModalManagerIpc = {
+export interface FrontendModalManagerIpc {
     openModal(url: string, ...args: any[]): void,
     closeModal(url: string): void,
     onModalVisibilityChange(listener: (url: string, visible: boolean) => void): void,

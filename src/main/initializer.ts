@@ -16,6 +16,7 @@ import {
     initBackendConnectionManagerIpc
 } from './ipc/connection/service/BackendConnectionManagerIpc'
 import { initBackendModalManagerIpc } from './ipc/modal/service/BackendModalManagerIpc'
+import { initBackendDriverManagerIpc } from './ipc/driver/service/BackendDriverManagerIpc'
 
 /**
  * Entrypoint of evitaLab app. Initializes the entire app.
@@ -44,6 +45,7 @@ export async function initialize(): Promise<void> {
     // initialize structure
     initBackendConnectionManagerIpc(skeletonManager, connectionManager, modalManager)
     initBackendModalManagerIpc(modalManager)
+    initBackendDriverManagerIpc(driverManager)
     await initSkeleton(skeletonManager, modalManager, connectionManager, instanceManager)
     await modalManager.initModal(NAVIGATION_PANEL_URL)
 

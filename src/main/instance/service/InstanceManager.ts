@@ -68,7 +68,7 @@ export class InstanceManager {
             throw new Error('Skeleton is not initialized yet.')
         }
 
-        const driver: Driver = this.driverManager.getDriver(connection.driverVersion)
+        const driver: Driver = await this.driverManager.getDriver(connection.driverVersion)
 
         const instance = new WebContentsView({
             webPreferences: {
@@ -78,7 +78,7 @@ export class InstanceManager {
         instance.setBounds(this.constructViewBounds());
         instance.setVisible(false)
         this._skeletonWindow.on('resize', () => instance.setBounds(this.constructViewBounds()))
-        await instance.webContents.loadFile(driver.url, this.constructInstanceUrlOptions(connection))
+        await instance.webContents.loadFile(driver.executablePath, this.constructInstanceUrlOptions(connection))
 
         this._skeletonWindow.contentView.addChildView(instance, 0) // adding it under every modal window
         this.instances.set(connection.id, instance)
@@ -103,7 +103,8 @@ export class InstanceManager {
             query: {
                 'evitalab': 'true',
                 'evitalab-server-name': btoa(this.constructServerNameForInstance(connection)),
-                'evitalab-pconnections': btoa(JSON.stringify(this.constructPreconfiguredConnectionsForInstance(connection)))
+                'evitalab-pconnections': btoa(JSON.stringify(this.constructPreconfiguredConnectionsForInstance(connection))),
+                'evitalab-readonly': 'true'
             }
         }
     }

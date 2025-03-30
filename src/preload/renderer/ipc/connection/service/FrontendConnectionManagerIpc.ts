@@ -14,7 +14,7 @@ import {
 /**
  * Interface of connection manager IPC for frontend renderer.
  */
-export type FrontendConnectionManagerIpc = {
+export interface FrontendConnectionManagerIpc {
     activateConnection(connectionId: ConnectionId | undefined): void,
     storeConnection(connection: ConnectionDto): void,
     storeConnectionsOrder(newOrder: ConnectionId[]): void,
@@ -30,6 +30,7 @@ export type FrontendConnectionManagerIpc = {
  */
 export function exposeFrontendConnectionManagerIpc(): void {
     contextBridge.exposeInMainWorld('connectionManager', {
+        // todo lho use invoke everywhere so i can await the response (that it is processed?)
         activateConnection(connectionId: ConnectionId | undefined): void {
             ipcRenderer.send(connectionManagerIpc_activateConnection, connectionId)
         },

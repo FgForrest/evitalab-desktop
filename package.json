@@ -9,7 +9,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx ."
+    "lint": "eslint --ext .ts,.tsx .",
+    "test": "vitest"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.6.0",
@@ -21,6 +22,8 @@
     "@electron-forge/plugin-fuses": "^7.6.0",
     "@electron-forge/plugin-vite": "^7.6.0",
     "@electron/fuses": "^1.8.0",
+    "@fetch-mock/vitest": "^0.2.13",
+    "@types/decompress": "^4.2.7",
     "@types/electron-squirrel-startup": "^1.0.2",
     "@types/xxhashjs": "^0.2.4",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
@@ -44,9 +47,13 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@mdi/font": "^7.4.47",
+    "decompress": "^4.2.1",
     "electron-log": "^5.2.4",
     "electron-squirrel-startup": "^1.0.1",
     "immutable": "^5.0.3",
+    "ky": "^1.7.5",
+    "semver": "^7.7.1",
+    "vitest": "^3.0.9",
     "vue": "^3.5.13",
     "vue-i18n": "^11.0.1",
     "vuedraggable": "^4.1.0",
