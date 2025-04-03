@@ -1,5 +1,5 @@
 import { createI18n } from 'vue-i18n'
-import en from '@/renderer/i18n/en.json'
+import en from '../i18n/en.json'
 
 /**
  * Lists all supported locales by evitaLab

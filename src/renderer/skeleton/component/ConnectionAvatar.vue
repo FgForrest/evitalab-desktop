@@ -17,7 +17,7 @@ const shortName = computed<string>(() => {
 </script>
 
 <template>
-    <VAvatar size="large" :color="connection.styling.color">
+    <VAvatar size="32" :color="connection.styling.color" border="sm">
         <span>{{ shortName }}</span>
     </VAvatar>
 </template>

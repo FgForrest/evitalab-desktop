@@ -120,7 +120,7 @@ export class InstanceManager {
     private constructViewBounds(): Rectangle {
         // todo lho move the sidebar width to common place
         return {
-            x: 57, // width of wrapper sidebar
+            x: 56, // width of wrapper sidebar
             y: 0,
             width: this._skeletonWindow.contentView.getBounds().width - 57,
             height: this._skeletonWindow.contentView.getBounds().height

@@ -12,8 +12,8 @@ export class SkeletonManager {
         // todo lho we should handle multiple windows somehow
 
         const skeletonWindow = new BrowserWindow({
-            width: 1024,
-            height: 860,
+            width: 1280,
+            height: 720,
             webPreferences: {
                 preload: path.join(__dirname, 'renderer-preload.js'),
             },
@@ -24,6 +24,8 @@ export class SkeletonManager {
         } else {
             await skeletonWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/skeleton/skeleton.html`))
         }
+        // manually uncomment for devtools
+        // skeletonWindow.webContents.openDevTools({ mode: 'detach' })
 
         this._skeletonWindow = skeletonWindow
         return this._skeletonWindow

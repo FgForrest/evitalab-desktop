@@ -23,6 +23,7 @@ import { initBackendDriverManagerIpc } from './ipc/driver/service/BackendDriverM
  */
 export async function initialize(): Promise<void> {
     log.initialize();
+    log.log('Initializing app...')
 
     // Handle creating/removing shortcuts on Windows when installing/uninstalling.
     if (started) {
@@ -41,6 +42,7 @@ export async function initialize(): Promise<void> {
     // initialization and is ready to create browser windows.
     // Some APIs can only be used after this event occurs.
     await app.whenReady()
+    log.log('Electron app ready.')
 
     // initialize structure
     initBackendConnectionManagerIpc(skeletonManager, connectionManager, modalManager)
@@ -48,6 +50,8 @@ export async function initialize(): Promise<void> {
     initBackendDriverManagerIpc(driverManager)
     await initSkeleton(skeletonManager, modalManager, connectionManager, instanceManager)
     await modalManager.initModal(NAVIGATION_PANEL_URL)
+
+    log.log('App structure initialized.')
 
     // Quit when all windows are closed, except on macOS. There, it's common
     // for applications and their menu bar to stay active until the user quits
@@ -69,6 +73,8 @@ export async function initialize(): Promise<void> {
     // initialize data
     await appConfig.init()
     connectionManager.init()
+
+    log.log('App initialized.')
 }
 
 async function initSkeleton(skeletonManager: SkeletonManager,

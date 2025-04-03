@@ -75,6 +75,16 @@ export class ConnectionManager extends EventEmitter {
         return this._connections.get(connectionId)
     }
 
+    getSimilarConnection(connectionName: string): Connection | undefined {
+        const normalizedName: string = connectionName.trim().toLowerCase()
+        for (const connection of this._connections.values()) {
+            if (connection.name.trim().toLowerCase() === normalizedName) {
+                return connection
+            }
+        }
+        return undefined
+    }
+
     async activateConnection(connectionId: ConnectionId | undefined): Promise<void> {
         if (connectionId != undefined && !this._connections.has(connectionId)) {
             throw new Error(`Cannot activate connection ${connectionId}, it doesn't exist.`)

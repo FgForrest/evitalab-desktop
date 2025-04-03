@@ -68,6 +68,8 @@ export class ModalManager extends EventEmitter {
         } else {
             await newModal.webContents.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}${url}`));
         }
+        // manually uncomment for devtools
+        // newModal.webContents.openDevTools()
 
         this._skeletonWindow.contentView.addChildView(newModal)
         this.initializedModals.set(url, newModal)

@@ -1,6 +1,54 @@
 {
-  "skeleton": {
+  "app": {
+    "name": "evitaLab"
+  },
+  "common": {
+    "placeholder": {
+      "empty": "<empty>",
+      "emptyArray": "<empty array>",
+      "null": "<null>",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "button": {
+      "close": "Close",
+      "cancel": "Cancel",
+      "remove": "Remove",
+      "confirm": "Confirm",
+      "add": "Add",
+      "save": "Save"
+    },
+    "dialog": {
+      "confirmDialog": {
+        "title": "Dangerous operation",
+        "message": "Warning! You are about to do dangerous operation. Are you sure you want to proceed?"
+      }
+    }
+  },
+  "navigation": {
     "panel": {
+      "button": {
+        "addConnection": "Add connection"
+      },
+      "manage": {
+        "evitaLabHelp": {
+          "title": "evitaLab Help",
+          "item": {
+            "evitaLabGithub": "evitaLab GitHub",
+            "discussEvitaLab": "Discuss evitaLab",
+            "reportEvitaLabIssue": "Report evitaLab issue"
+          }
+        },
+        "evitaDBHelp": {
+          "title": "evitaDB Help",
+          "item": {
+            "evitaDBDocumentation": "evitaDB Documentation",
+            "evitaDBGithub": "evitaDB GitHub",
+            "discussEvitaDB": "Discuss evitaDB",
+            "reportEvitaDBIssue": "Report evitaDB issue"
+          }
+        }
+      },
       "link": {
         "evitaDBDocumentation": {
           "icon": {
@@ -14,6 +62,81 @@
           },
           "tooltip": "Discuss on Discord"
         }
+      },
+      "connection": {
+        "title": "Connections",
+        "item": {
+          "action": {
+            "edit": "Edit connection",
+            "remove": "Remove connection"
+          }
+        }
+      }
+    }
+  },
+  "connection": {
+    "editor": {
+      "title": {
+        "add": "Add connection",
+        "edit": "Edit connection"
+      },
+      "form": {
+        "connectionName": {
+          "label": "Connection name",
+          "validations": {
+            "required": "Name of connection is required.",
+            "duplicate": "Different connection with similar name already exists."
+          }
+        },
+        "shortConnectionName": {
+          "label": "Short connection name",
+          "hint": "Helps quickly identify connection in tight spaces",
+          "validations": {
+            "tooLong": "Short connection name cannot be longer that 3 characters."
+          }
+        },
+        "serverUrl": {
+          "label": "Server URL",
+          "hint": "Base scheme://hostname:port of evitaLab API configured on the server you want to connect to.",
+          "validations": {
+            "required": "Server URL is required.",
+            "invalidUrl": "Server URL is not a valid URL.",
+            "notReady": "Server is not ready yet.",
+            "labApiMissing": "evitaLab API is not enabled on the server.",
+            "notLabUrl": "Server URL is not URL of evitaLab API.",
+            "grpcApiMissing": "gRPC API is not enabled on the server.",
+            "unreachable": "Server is not reachable."
+          }
+        },
+        "color": {
+          "label": "Color",
+          "hint": "Helps distinguish connections among each other"
+        }
+      },
+      "button": {
+        "downloadingDriver": "Downloading driver..."
+      },
+      "driverSelect": {
+        "usedDriver": {
+          "label": "Used driver",
+          "hint": {
+            "tooOld": "Current server requires newer version of the driver. Older driver may not work properly with the newer server version."
+          }
+        },
+        "latestAvailableDriver": {
+          "label": "Latest available driver",
+          "placeholder": {
+            "noDriver": "No driver available"
+          }
+        }
+      }
+    },
+    "removeDialog": {
+      "title": "Remove {connectionName} connection",
+      "question": "Do you want to remove the connection?",
+      "notification": {
+        "connectionRemoved": "The {connectionName} connection has been successfully removed.",
+        "couldNotRemoveConnection": "Could not remove the {connectionName} connection: {reason}"
       }
     }
   }

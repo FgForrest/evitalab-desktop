@@ -8,7 +8,7 @@ import {
 import {
     connectionManagerIpc_activateConnection,
     connectionManagerIpc_getConnection,
-    connectionManagerIpc_getConnections,
+    connectionManagerIpc_getConnections, connectionManagerIpc_getSimilarConnection,
     connectionManagerIpc_onConnectionActivation,
     connectionManagerIpc_onConnectionsChange,
     connectionManagerIpc_removeConnection,
@@ -110,6 +110,16 @@ export function initBackendConnectionManagerIpc(skeletonManager: SkeletonManager
             return connectionManager.connections
                 .map(it => convertConnectionToDto(it))
                 .toArray()
+        }
+    )
+    ipcMain.handle(
+        connectionManagerIpc_getSimilarConnection,
+        (event: IpcMainEvent, connectionName: string) => {
+            const connection: Connection | undefined = connectionManager.getSimilarConnection(connectionName)
+            if (connection == undefined) {
+                return undefined
+            }
+            return convertConnectionToDto(connection)
         }
     )
 

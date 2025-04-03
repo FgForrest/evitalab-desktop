@@ -7,6 +7,9 @@ import { computed, ref, watch } from 'vue'
 import semver from 'semver/preload'
 import { FrontendDriverManagerIpc } from '../../../preload/renderer/ipc/driver/service/FrontendDriverManagerIpc'
 import { DriverDto } from '../../../common/ipc/driver/model/DriverDto'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 //@ts-ignore
 const driverManager: FrontendDriverManagerIpc = window.driverManager
@@ -95,6 +98,8 @@ async function resolveLatestAvailableDriver(): Promise<void> {
             } catch (e) {
                 // todo lho impl toaster
                 console.error(e)
+                // server probably not reachable
+                latestAvailableDriver.value = undefined
             }
         } catch (e) {
             // serverUrl not URL, abort
@@ -114,13 +119,13 @@ function chooseNewerDriver(): void {
 </script>
 
 <template>
-    <div class="driver-select-input">
+    <div :class="['driver-select-input', { 'driver-select-input--with-used-driver': isUsedDriverVersionPresent }]">
         <VTextField
             v-if="isUsedDriverVersionPresent"
             :model-value="usedDriverVersion"
             readonly
             :disabled="disabled"
-            label="Used driver"
+            :label="t('connection.editor.driverSelect.usedDriver.label')"
             :color="usedDriverTooOld ? 'warning' : undefined"
         >
             <template #prepend-inner>
@@ -131,8 +136,7 @@ function chooseNewerDriver(): void {
                         </VIcon>
                     </template>
                     <template #default>
-                        Current server requires newer version of the driver. Older driver may not work properly with the
-                        newer server version.
+                        {{ t('connection.editor.driverSelect.usedDriver.hint.tooOld') }}
                     </template>
                 </VTooltip>
             </template>
@@ -142,13 +146,16 @@ function chooseNewerDriver(): void {
             :model-value="latestAvailableDriver?.version"
             readonly
             :disabled="disabled"
-            label="Latest available driver"
-            placeholder="No driver available"
+            :label="t('connection.editor.driverSelect.latestAvailableDriver.label')"
+            :placeholder="t('connection.editor.driverSelect.latestAvailableDriver.placeholder.noDriver')"
+            :loading="resolvingLatestAvailableDriver"
         >
             <template #prepend-inner>
-                <VProgressCircular v-if="resolvingLatestAvailableDriver" indeterminate />
-                <VIcon v-else-if="isNewerDriverAvailable">mdi-alert-decagram-outline</VIcon>
-                <VIcon v-else-if="isNewestDriverApplied">mdi-check</VIcon>
+                <template v-if="resolvingLatestAvailableDriver">
+                    <!-- note: loading is handled by the text field -->
+                </template>
+                <VIcon v-else-if="isNewerDriverAvailable" color="warning">mdi-alert-decagram-outline</VIcon>
+                <VIcon v-else-if="isNewestDriverApplied" color="success">mdi-check</VIcon>
             </template>
             <template #append-inner>
                 <VBtn
@@ -168,7 +175,13 @@ function chooseNewerDriver(): void {
 
 <style lang="scss" scoped>
 .driver-select-input {
-    display: flex;
-    gap: 1rem;
+    width: 100%;
+    display: inline-grid;
+    grid-template-columns: 1fr;
+
+    &--with-used-driver {
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
 }
 </style>

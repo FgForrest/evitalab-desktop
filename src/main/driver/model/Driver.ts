@@ -1,4 +1,3 @@
-import { app } from 'electron'
 
 /**
  * Describes a single available driver for usage by a connection
@@ -24,7 +23,9 @@ export class Driver {
      * Local path of downloaded driver.
      */
     get path(): string {
-        return `${app.getPath('userData')}/drivers/${this.version}`
+        // todo lho switch
+        return '/Users/lukin/dev/evitalab'
+        // return `${app.getPath('userData')}/drivers/${this.version}`
     }
 
     /**

@@ -15,18 +15,25 @@ export default defineConfig({
         // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
         vuetify({
             autoImport: true,
-            // todo lho impl
-            // styles: {
-            //     configFile: 'src/renderer/styles/settings.scss'
-            // }
+            styles: {
+                configFile: 'src/renderer/styles/settings.scss'
+            }
         })
     ],
+    css: {
+        preprocessorOptions: {
+            sass: {
+                api: 'modern'
+            }
+        }
+    },
     build: {
         rollupOptions: {
             input: {
                 skeleton: resolve(__dirname, 'src/renderer/skeleton/skeleton.html'),
                 navigationPanel: resolve(__dirname, 'src/renderer/navigation-panel/navigation-panel.html'),
                 connectionEditor: resolve(__dirname, 'src/renderer/connection/editor/connection-editor.html'),
+                connectionRemoveDialog: resolve(__dirname, 'src/renderer/connection/remove-dialog/connection-remove-dialog.html'),
             }
         }
     },
