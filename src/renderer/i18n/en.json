@@ -25,6 +25,33 @@
       }
     }
   },
+  "welcomeScreen": {
+    "changelog": "changelog",
+    "description": "evitaDB desktop client",
+    "blog": {
+      "thumbnail": {
+        "alt": "Image - {title}"
+      },
+      "button": {
+        "read": "Read"
+      }
+    },
+    "link": {
+      "evitaDBDocumentation": {
+        "text": "Check out the {link}",
+        "link": "evitaDB documentation"
+      },
+      "evitaLabGitHub": {
+        "text": "Give us a ⭐ on {link}",
+        "link": "GitHub"
+      },
+      "discord": {
+        "text": "Reach out to us on {link}",
+        "link": "Discord"
+      },
+      "submitIssue": "Submit an issue"
+    }
+  },
   "navigation": {
     "panel": {
       "button": {

@@ -1,17 +1,25 @@
 <script setup lang="ts">
 import NavigationPanel from './component/NavigationPanel.vue'
-import { useI18n } from 'vue-i18n'
+import WelcomeScreen from '../welcome-screen/component/WelcomeScreen.vue'
 
-const { t } = useI18n()
 </script>
 
 <template>
     <VApp>
         <NavigationPanel />
 
-        <VMain>
-<!--        todo lho welcome page-->
-            <h1>{{ t('app.name') }}</h1>
+        <VMain :scrollable="false" class="main">
+            <WelcomeScreen />
         </VMain>
     </VApp>
 </template>
+
+<style lang="scss" scoped>
+.main {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    justify-items: stretch;
+    align-items: stretch;
+}
+</style>
