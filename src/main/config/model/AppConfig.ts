@@ -16,7 +16,6 @@ export const CONFIG_EMIT_UPDATE = 'update'
 export class AppConfig extends EventEmitter {
 
     private _connections: List<ConnectionConfig> = List()
-    private _activeConnection: ConnectionId | undefined = undefined
 
     async init(): Promise<void> {
         try {
@@ -24,7 +23,6 @@ export class AppConfig extends EventEmitter {
             if (storedConfig.length > 0) {
                 const parsedConfig: StorableConfig = JSON.parse(storedConfig) as StorableConfig
                 this._connections = List(parsedConfig.connections)
-                this._activeConnection = parsedConfig.activeConnection
             }
         } catch (e) {
             log.error('Could not load stored app config: ', e.message)
@@ -38,15 +36,6 @@ export class AppConfig extends EventEmitter {
 
     async updateConnections(connections: List<ConnectionConfig>): Promise<void> {
         this._connections = connections
-        await this.storeConfig()
-    }
-
-    get activeConnection(): ConnectionId | undefined {
-        return this._activeConnection
-    }
-
-    async updateActiveConnection(activeConnection: ConnectionId | undefined): Promise<void> {
-        this._activeConnection = activeConnection
         await this.updated()
     }
 
@@ -57,8 +46,7 @@ export class AppConfig extends EventEmitter {
 
     private async storeConfig(): Promise<void> {
         const configToStore: StorableConfig = {
-            connections: this._connections.toArray(),
-            activeConnection: this._activeConnection
+            connections: this._connections.toArray()
         }
         const serializedConfig: string = JSON.stringify(configToStore)
         await fs.writeFile(this.configPath, serializedConfig, 'utf-8')
@@ -91,6 +79,5 @@ export interface ConnectionStylingConfig {
 }
 
 interface StorableConfig {
-    connections: ConnectionConfig[],
-    activeConnection: ConnectionId | undefined
+    connections: ConnectionConfig[]
 }

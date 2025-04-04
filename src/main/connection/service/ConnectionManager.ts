@@ -54,10 +54,6 @@ export class ConnectionManager extends EventEmitter {
             )
             this.notifyConnectionsChange()
         }
-        if (this.appConfig.activeConnection != undefined) {
-            this._activeConnection = this.appConfig.activeConnection
-            this.notifyConnectionActivated()
-        }
     }
 
     get activeConnection(): Connection | undefined {
@@ -91,7 +87,6 @@ export class ConnectionManager extends EventEmitter {
         }
         this._activeConnection = connectionId
 
-        await this.updateActiveConnectionConfig()
         this.notifyConnectionActivated()
     }
 
@@ -128,13 +123,8 @@ export class ConnectionManager extends EventEmitter {
         }
         this._connections.delete(connectionId);
 
-        await this.updateActiveConnectionConfig()
         await this.updateConnectionsConfig()
         this.notifyConnectionsChange()
-    }
-
-    private updateActiveConnectionConfig(): Promise<void> {
-        return this.appConfig.updateActiveConnection(this._activeConnection)
     }
 
     private updateConnectionsConfig(): Promise<void> {
