@@ -9,6 +9,7 @@ import { ConnectionId } from '../../../main/connection/model/ConnectionId'
 import { FrontendConnectionManagerIpc } from '../../../preload/renderer/ipc/connection/service/FrontendConnectionManagerIpc'
 import { FrontendModalManagerIpc } from '../../../preload/renderer/ipc/modal/service/FrontendModalManagerIpc'
 import { useI18n } from 'vue-i18n'
+import { NAVIGATION_PANEL_URL } from '../navigationPanelConstants'
 
 //@ts-ignore
 const connectionManager: FrontendConnectionManagerIpc = window.connectionManager
@@ -42,6 +43,7 @@ function selectConnection(item: any): void {
     } else {
         connectionManager.activateConnection(item.id)
     }
+    modalManager.closeModal(NAVIGATION_PANEL_URL)
 }
 
 function addConnection(): void {
