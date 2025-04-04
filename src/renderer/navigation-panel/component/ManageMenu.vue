@@ -69,13 +69,17 @@ function handleOptionClick(selected: any): void {
         const option: ManageOptionType = selected[0] as ManageOptionType
         switch (option) {
             case ManageOptionType.EvitaLabGithub:
-                window.open('https://github.com/lukashornych/evitalab', '_blank');
+                // it would be confused for users to distinguish between desktop app and driver app, that why we direct
+                // them to desktop app
+                window.open('https://github.com/lukashornych/evitalab-desktop', '_blank');
                 break
             case ManageOptionType.DiscussEvitaLab:
                 window.open('https://discord.gg/VsNBWxgmSw', '_blank');
                 break
             case ManageOptionType.ReportEvitaLabIssue:
-                window.open('https://github.com/lukashornych/evitalab/issues/new', '_blank');
+                // it would be confused for users to distinguish between desktop app and driver app, that why we direct
+                // them to desktop app
+                window.open('https://github.com/lukashornych/evitalab-desktop/issues/new', '_blank');
                 break
             case ManageOptionType.EvitaDBDocumentation:
                 window.open('https://evitadb.io/documentation', '_blank');
