@@ -18,6 +18,9 @@ const modalManager: FrontendModalManagerIpc = window.modalManager
 const { t } = useI18n()
 
 const activatedConnections = ref<ConnectionId[]>([])
+connectionManager.getActiveConnection()
+    .then(it => activatedConnections.value = [it.id])
+
 const connections = ref<ConnectionDto[]>([])
 connectionManager.getConnections()
     .then((fetchedConnections: ConnectionDto[]) => connections.value = fetchedConnections)
@@ -68,7 +71,7 @@ function storeConnectionsOrder(): void {
                         v-bind="props"
                         icon
                         density="compact"
-                        variant="text"
+                        variant="plain"
                         style="padding: 0 !important;"
                         @click="addConnection"
                     >

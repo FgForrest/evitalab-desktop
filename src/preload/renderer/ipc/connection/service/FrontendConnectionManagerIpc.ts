@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { ConnectionId } from '../../../../../main/connection/model/ConnectionId'
 import { ConnectionDto } from '../../../../../common/ipc/connection/model/ConnectionDto'
 import {
-    connectionManagerIpc_activateConnection,
+    connectionManagerIpc_activateConnection, connectionManagerIpc_getActiveConnection,
     connectionManagerIpc_getConnection,
     connectionManagerIpc_getConnections, connectionManagerIpc_getSimilarConnection,
     connectionManagerIpc_onConnectionActivation,
@@ -22,6 +22,7 @@ export interface FrontendConnectionManagerIpc {
     getConnections(): Promise<ConnectionDto[]>,
     getConnection(connectionId: ConnectionId): Promise<ConnectionDto | undefined>,
     getSimilarConnection(connectionName: string): Promise<ConnectionDto | undefined>,
+    getActiveConnection(): Promise<ConnectionDto | undefined>
     onConnectionActivation(listener: (activated: ConnectionDto | undefined) => void): void
     onConnectionsChange(listener: (connections: ConnectionDto[]) => void): void
 }
@@ -52,6 +53,9 @@ export function exposeFrontendConnectionManagerIpc(): void {
         },
         getSimilarConnection(connectionName: string): Promise<ConnectionDto | undefined> {
             return ipcRenderer.invoke(connectionManagerIpc_getSimilarConnection, connectionName)
+        },
+        getActiveConnection(): Promise<ConnectionDto | undefined> {
+            return ipcRenderer.invoke(connectionManagerIpc_getActiveConnection)
         },
         onConnectionActivation(listener: (activated: ConnectionDto) => void): void {
             ipcRenderer.on(connectionManagerIpc_onConnectionActivation, (_event, activated) => listener(activated))

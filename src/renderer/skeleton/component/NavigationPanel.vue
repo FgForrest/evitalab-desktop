@@ -4,7 +4,7 @@
  */
 
 import ConnectionAvatar from './ConnectionAvatar.vue'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { ConnectionId } from '../../../main/connection/model/ConnectionId'
 import { NAVIGATION_PANEL_URL } from '../../navigation-panel/navigationPanelConstants'
 import {
@@ -19,6 +19,12 @@ const connectionManager: FrontendConnectionManagerIpc = window.connectionManager
 const modalManager: FrontendModalManagerIpc = window.modalManager
 
 const activatedConnections = ref<ConnectionId[]>([])
+connectionManager.getActiveConnection()
+    .then(it => {
+        console.log(it)
+        activatedConnections.value = [it.id]
+    })
+
 const connections = ref<ConnectionDto[]>([])
 connectionManager.getConnections()
     .then((fetchedConnections: ConnectionDto[]) => connections.value = fetchedConnections)

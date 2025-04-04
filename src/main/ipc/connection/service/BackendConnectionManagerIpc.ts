@@ -6,7 +6,7 @@ import {
     ConnectionManager
 } from '../../../connection/service/ConnectionManager'
 import {
-    connectionManagerIpc_activateConnection,
+    connectionManagerIpc_activateConnection, connectionManagerIpc_getActiveConnection,
     connectionManagerIpc_getConnection,
     connectionManagerIpc_getConnections, connectionManagerIpc_getSimilarConnection,
     connectionManagerIpc_onConnectionActivation,
@@ -120,6 +120,16 @@ export function initBackendConnectionManagerIpc(skeletonManager: SkeletonManager
                 return undefined
             }
             return convertConnectionToDto(connection)
+        }
+    )
+    ipcMain.handle(
+        connectionManagerIpc_getActiveConnection,
+        () => {
+            const activeConnection: Connection | undefined = connectionManager.activeConnection
+            if (activeConnection == undefined) {
+                return undefined
+            }
+            return convertConnectionToDto(activeConnection)
         }
     )
 
