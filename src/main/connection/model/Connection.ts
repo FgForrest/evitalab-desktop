@@ -1,8 +1,6 @@
 import { ConnectionId } from './ConnectionId'
-import XXH, { HashObject } from 'xxhashjs'
 import { ConnectionStyling } from './ConnectionStyling'
-
-const hasher: HashObject = XXH.h64()
+import { v4 as uuidv4} from 'uuid'
 
 /**
  * Represents a single connection to evitaDB server with associated driver.
@@ -21,7 +19,7 @@ export class Connection {
                 serverUrl: string,
                 driverVersion: string,
                 styling: ConnectionStyling) {
-        this.id = id ? id : hasher.update(name).digest().toString(16)
+        this.id = id ? id : uuidv4()
         this.name = name
         this.serverUrl = this.validateAndNormalizeUrl(serverUrl)
         this.driverVersion = driverVersion
