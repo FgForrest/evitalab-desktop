@@ -1,6 +1,8 @@
 import { BrowserWindow } from 'electron'
 import path from 'path'
 
+const SKELETON_PATH = '/src/renderer/skeleton/skeleton.html'
+
 /**
  * Manages lifecycle of the skeleton, that is the main wrapper view handles all other app things.
  */
@@ -20,9 +22,9 @@ export class SkeletonManager {
         })
 
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-            await skeletonWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL + '/src/renderer/skeleton/skeleton.html')
+            await skeletonWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL + SKELETON_PATH)
         } else {
-            await skeletonWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/skeleton/skeleton.html`))
+            await skeletonWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}${SKELETON_PATH}`))
         }
         // manually uncomment for devtools
         // skeletonWindow.webContents.openDevTools({ mode: 'detach' })

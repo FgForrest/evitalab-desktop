@@ -4,6 +4,8 @@ import Rectangle = Electron.Rectangle
 import { List } from 'immutable'
 import { EventEmitter } from 'events'
 
+const MODAL_WINDOW_BASE_PATH = '/src/renderer'
+
 /**
  * Gets emitted when a modal is being passed args.
  */
@@ -64,9 +66,9 @@ export class ModalManager extends EventEmitter {
         newModal.setVisible(false)
         this._skeletonWindow.on('resize', () => newModal.setBounds(this.constructViewBounds()))
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-            await newModal.webContents.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL + `/src/renderer${url}`);
+            await newModal.webContents.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL + `${MODAL_WINDOW_BASE_PATH}${url}`);
         } else {
-            await newModal.webContents.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}${url}`));
+            await newModal.webContents.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}${MODAL_WINDOW_BASE_PATH}${url}`));
         }
         // manually uncomment for devtools
         // newModal.webContents.openDevTools()

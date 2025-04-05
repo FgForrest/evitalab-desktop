@@ -75,7 +75,6 @@ const connectionNameRules = [
         return t('connection.editor.form.connectionName.validations.required')
     },
     async (value: any) => {
-    // todo lho not working for editing
         const similarConnection: ConnectionDto | undefined = await connectionManager.getSimilarConnection(value)
         if (similarConnection == undefined || similarConnection.id === connectionId.value) {
             return true
