@@ -89,6 +89,8 @@ async function initSkeleton(skeletonManager: SkeletonManager,
     instanceManager.skeletonWindow = skeletonWindow
     modalManager.skeletonWindow = skeletonWindow
 
+    skeletonWindow.on('close', () => connectionManager.activateConnection(undefined))
+
     connectionManager.on(
         CONNECTION_MANAGER_EMIT_CONNECTION_ACTIVATION,
         (activatedConnection: Connection | undefined) => {
