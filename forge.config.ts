@@ -11,14 +11,23 @@ const config: ForgeConfig = {
     packagerConfig: {
         asar: true,
         name: 'evitalab', // seems to be only for building, not displaying to user
-        appCategoryType: 'public.app-category.developer-tools'
+        appCategoryType: 'public.app-category.developer-tools',
+        icon: 'public/icon/icon'
     },
     rebuildConfig: {},
     makers: [
         new MakerSquirrel({}),
         new MakerZIP({}, ['darwin']),
-        new MakerRpm({}),
-        new MakerDeb({})
+        new MakerRpm({
+            options: {
+                icon: 'public/icon/icon.png'
+            }
+        }),
+        new MakerDeb({
+            options: {
+                icon: 'public/icon/icon.png'
+            }
+        })
     ],
     plugins: [
         new VitePlugin({
