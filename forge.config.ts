@@ -6,6 +6,7 @@ import { MakerRpm } from '@electron-forge/maker-rpm'
 import { VitePlugin } from '@electron-forge/plugin-vite'
 import { FusesPlugin } from '@electron-forge/plugin-fuses'
 import { FuseV1Options, FuseVersion } from '@electron/fuses'
+import { MakerDMG } from '@electron-forge/maker-dmg'
 
 const config: ForgeConfig = {
     packagerConfig: {
@@ -18,14 +19,29 @@ const config: ForgeConfig = {
     makers: [
         new MakerSquirrel({}),
         new MakerZIP({}, ['darwin']),
+        new MakerDMG({
+            name: 'evitaLab',
+            icon: 'public/icon/icon.icns',
+            background: 'public/installer/background.png'
+        }),
         new MakerRpm({
             options: {
-                icon: 'public/icon/icon.png'
+                name: 'evitaLab',
+                icon: 'public/icon/icon.png',
+                description: 'evitaDB Desktop Client',
+                categories: ['Development'],
+                homepage: 'https://github.com/lukashornych/evitalab-desktop'
             }
         }),
         new MakerDeb({
             options: {
-                icon: 'public/icon/icon.png'
+                name: 'evitaLab',
+                icon: 'public/icon/icon.png',
+                description: 'evitaDB Desktop Client',
+                maintainer: 'Lukáš Hornych',
+                homepage: 'https://github.com/lukashornych/evitalab-desktop',
+                categories: ['Development'],
+                section: 'database'
             }
         })
     ],
