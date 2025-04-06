@@ -16,7 +16,7 @@ export class Driver {
      * Where the driver can be downloaded in form of .zip archive
      */
     get sourceUrl(): string {
-        return `https://github.com/lukashornych/evitalab/releases/download/v${this.version}/Dist-Driver.zip`
+        return `https://github.com/lukashornych/evitalab/releases/download/v${this.version}/dist-driver.zip`
     }
 
     /**
