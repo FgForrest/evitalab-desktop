@@ -1,6 +1,6 @@
 import log from 'electron-log/main'
 import started from 'electron-squirrel-startup'
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, Menu } from 'electron'
 import { AppConfig } from './config/model/AppConfig'
 import { SkeletonManager } from './skeleton/service/SkeletonManager'
 import { ModalManager } from './modal/service/ModalManager'
@@ -17,11 +17,14 @@ import {
 } from './ipc/connection/service/BackendConnectionManagerIpc'
 import { initBackendModalManagerIpc } from './ipc/modal/service/BackendModalManagerIpc'
 import { initBackendDriverManagerIpc } from './ipc/driver/service/BackendDriverManagerIpc'
+import menu from './menu'
 
 /**
  * Entrypoint of evitaLab app. Initializes the entire app.
  */
 export async function initialize(): Promise<void> {
+    Menu.setApplicationMenu(menu)
+
     log.initialize();
     log.log('Initializing app...')
 

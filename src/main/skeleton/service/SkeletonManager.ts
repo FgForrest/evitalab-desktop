@@ -17,6 +17,7 @@ export class SkeletonManager {
             width: 1280,
             height: 720,
             icon: path.join(__dirname, 'icon/icon.png'),
+            autoHideMenuBar: true,
             webPreferences: {
                 preload: path.join(__dirname, 'renderer-preload.js'),
             },
