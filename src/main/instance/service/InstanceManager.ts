@@ -7,6 +7,7 @@ import { DriverManager } from '../../driver/service/DriverManager'
 import { Driver } from '../../driver/model/Driver'
 import LoadFileOptions = Electron.LoadFileOptions
 import Rectangle = Electron.Rectangle
+import debounce from '../../util/debounce'
 
 /**
  * Instance represents alive connection, that is a browser view with correct driver connection to a specific evitaDB server.
@@ -77,8 +78,21 @@ export class InstanceManager {
         })
         instance.setBounds(this.constructViewBounds());
         instance.setVisible(false)
-        this._skeletonWindow.on('resize', () => instance.setBounds(this.constructViewBounds()))
+
+        const resizer = debounce(
+            () => instance.setBounds(this.constructViewBounds()),
+            50
+        )
+        this._skeletonWindow.on('resize', resizer)
+        this._skeletonWindow.on('maximize', resizer)
+        this._skeletonWindow.on('unmaximize', resizer)
+        this._skeletonWindow.on('enter-full-screen', resizer)
+        this._skeletonWindow.on('leave-full-screen', resizer)
+
         await instance.webContents.loadFile(driver.executablePath, this.constructInstanceUrlOptions(connection))
+
+        // manually uncomment for devtools
+        // instance.webContents.openDevTools()
 
         this._skeletonWindow.contentView.addChildView(instance, 0) // adding it under every modal window
         this.instances.set(connection.id, instance)
@@ -118,12 +132,12 @@ export class InstanceManager {
     }
 
     private constructViewBounds(): Rectangle {
-        // todo lho move the sidebar width to common place
+        const skeletonBounds: Rectangle = this._skeletonWindow.contentView.getBounds()
         return {
             x: 56, // width of wrapper sidebar
             y: 0,
-            width: this._skeletonWindow.contentView.getBounds().width - 57,
-            height: this._skeletonWindow.contentView.getBounds().height
+            width: skeletonBounds.width - 57,
+            height: skeletonBounds.height
         };
     }
 }

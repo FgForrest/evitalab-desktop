@@ -8,7 +8,7 @@ import {
 import { FrontendModalManagerIpc } from '../../../preload/renderer/ipc/modal/service/FrontendModalManagerIpc'
 import { FrontendDriverManagerIpc } from '../../../preload/renderer/ipc/driver/service/FrontendDriverManagerIpc'
 import { ConnectionDto } from '../../../common/ipc/connection/model/ConnectionDto'
-import { computeShortConnectionName } from '../../../common/utils/connection'
+import { computeShortConnectionName } from '../../../common/util/connection'
 import DriverSelect from '../../driver/component/DriverSelect.vue'
 import VFormDialog from '../../common/component/VFormDialog.vue'
 import { useI18n } from 'vue-i18n'

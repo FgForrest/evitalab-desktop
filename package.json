@@ -1,6 +1,6 @@
 {
-  "name": "evitalab-desktop",
-  "productName": "evitaLab Desktop",
+  "name": "evitalab",
+  "productName": "evitaLab",
   "version": "1.0.0",
   "description": "evitaLab Desktop application",
   "main": ".vite/build/main.js",

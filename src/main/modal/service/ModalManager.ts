@@ -3,6 +3,7 @@ import path from 'path'
 import Rectangle = Electron.Rectangle
 import { List } from 'immutable'
 import { EventEmitter } from 'events'
+import debounce from '../../util/debounce'
 
 const MODAL_WINDOW_BASE_PATH = '/src/renderer'
 
@@ -64,12 +65,23 @@ export class ModalManager extends EventEmitter {
         newModal.setBackgroundColor('#00000000');
         newModal.setBounds(this.constructViewBounds());
         newModal.setVisible(false)
-        this._skeletonWindow.on('resize', () => newModal.setBounds(this.constructViewBounds()))
+
+        const resizer = debounce(
+            () => newModal.setBounds(this.constructViewBounds()),
+            50
+        )
+        this._skeletonWindow.on('resize', resizer)
+        this._skeletonWindow.on('maximize', resizer)
+        this._skeletonWindow.on('unmaximize', resizer)
+        this._skeletonWindow.on('enter-full-screen', resizer)
+        this._skeletonWindow.on('leave-full-screen', resizer)
+
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
             await newModal.webContents.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL + `${MODAL_WINDOW_BASE_PATH}${url}`);
         } else {
             await newModal.webContents.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}${MODAL_WINDOW_BASE_PATH}${url}`));
         }
+
         // manually uncomment for devtools
         // newModal.webContents.openDevTools()
 
@@ -110,11 +122,12 @@ export class ModalManager extends EventEmitter {
     }
 
     private constructViewBounds(): Rectangle {
+        const skeletonBounds: Rectangle = this._skeletonWindow.contentView.getBounds()
         return {
             x: 0,
             y: 0,
-            width: this._skeletonWindow.contentView.getBounds().width,
-            height: this._skeletonWindow.contentView.getBounds().height
+            width: skeletonBounds.width,
+            height: skeletonBounds.height
         };
     }
 

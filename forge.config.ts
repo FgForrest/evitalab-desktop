@@ -9,7 +9,9 @@ import { FuseV1Options, FuseVersion } from '@electron/fuses'
 
 const config: ForgeConfig = {
     packagerConfig: {
-        asar: true
+        asar: true,
+        name: 'evitalab', // seems to be only for building, not displaying to user
+        appCategoryType: 'public.app-category.developer-tools'
     },
     rebuildConfig: {},
     makers: [

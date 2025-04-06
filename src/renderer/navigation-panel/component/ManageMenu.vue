@@ -79,7 +79,7 @@ function handleOptionClick(selected: any): void {
             case ManageOptionType.ReportEvitaLabIssue:
                 // it would be confused for users to distinguish between desktop app and driver app, that why we direct
                 // them to desktop app
-                window.open('https://github.com/lukashornych/evitalab-desktop/issues/new', '_blank');
+                window.open('https://github.com/lukashornych/evitalab-desktop/issues', '_blank');
                 break
             case ManageOptionType.EvitaDBDocumentation:
                 window.open('https://evitadb.io/documentation', '_blank');
@@ -91,7 +91,7 @@ function handleOptionClick(selected: any): void {
                 window.open('https://discord.gg/VsNBWxgmSw', '_blank');
                 break
             case ManageOptionType.ReportEvitaDBIssue:
-                window.open('https://github.com/FgForrest/evitaDB/issues/new', '_blank');
+                window.open('https://github.com/FgForrest/evitaDB/issues', '_blank');
                 break
             default:
                 // todo lho impl

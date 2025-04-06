@@ -2,7 +2,7 @@
 
 import { computed } from 'vue'
 import { ConnectionDto } from '../../../common/ipc/connection/model/ConnectionDto'
-import { computeShortConnectionName } from '../../../common/utils/connection'
+import { computeShortConnectionName } from '../../../common/util/connection'
 
 const props = defineProps<{
     connection: ConnectionDto
