@@ -19,7 +19,7 @@ export type FrontendDriverManagerIpc = {
  * Implementation of driver manager IPC for frontend renderer
  */
 export function exposeFrontendDriverManagerIpc(): void {
-    contextBridge.exposeInMainWorld('driverManager', {
+    contextBridge.exposeInMainWorld('labDriverManager', {
         getDriver(version: string): Promise<DriverDto> {
             return ipcRenderer.invoke(driverManagerIpc_getDriver, version)
         },

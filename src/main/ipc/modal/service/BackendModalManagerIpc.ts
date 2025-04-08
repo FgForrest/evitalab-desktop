@@ -9,28 +9,11 @@ import {
     modalManagerIpc_closeModal, modalManagerIpc_onModalArgsPassed, modalManagerIpc_onModalVisibilityChange,
     modalManagerIpc_openModal
 } from '../../../../common/ipc/modal/service/ModalManagerIpc'
-import WebContents = Electron.WebContents
-
-/**
- * Implementation of modal manager IPC for backend.
- */
-export class BackendModalManagerIpc {
-
-    emitModalArgsPassed(target: WebContents, args: any[]): void {
-        target.send(modalManagerIpc_onModalArgsPassed, ...args)
-    }
-
-    emitModalVisibilityChange(target: WebContents, url: string, visible: boolean): void {
-        target.send(modalManagerIpc_onModalVisibilityChange, url, visible)
-    }
-
-}
 
 /**
  * Initializes implementation of modal manager IPC for backend.
  */
-export function initBackendModalManagerIpc(modalManager: ModalManager): BackendModalManagerIpc {
-    const backendModalManagerIpc: BackendModalManagerIpc = new BackendModalManagerIpc()
+export function initBackendModalManagerIpc(modalManager: ModalManager): void {
 
     ipcMain.on(
         modalManagerIpc_openModal,
@@ -49,15 +32,21 @@ export function initBackendModalManagerIpc(modalManager: ModalManager): BackendM
     modalManager.on(
         MODAL_MANAGER_EMIT_MODAL_ARGS_PASS,
         (modal: WebContentsView, args: any[]) => {
-            backendModalManagerIpc.emitModalArgsPassed(modal.webContents, args)
+            emitModalArgsPassed(modal, args)
         }
     )
     modalManager.on(
         MODAL_MANAGER_EMIT_MODAL_VISIBILITY_CHANGE,
         (modal: WebContentsView, url: string, visible: boolean) => {
-            backendModalManagerIpc.emitModalVisibilityChange(modal.webContents, url, visible)
+            emitModalVisibilityChange(modal, url, visible)
         }
     )
+}
 
-    return backendModalManagerIpc
+function emitModalArgsPassed(target: WebContentsView, args: any[]): void {
+    target.webContents.send(modalManagerIpc_onModalArgsPassed, ...args)
+}
+
+function emitModalVisibilityChange(target: WebContentsView, url: string, visible: boolean): void {
+    target.webContents.send(modalManagerIpc_onModalVisibilityChange, url, visible)
 }

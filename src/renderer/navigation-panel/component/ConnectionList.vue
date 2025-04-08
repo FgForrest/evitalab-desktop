@@ -11,10 +11,8 @@ import { FrontendModalManagerIpc } from '../../../preload/renderer/ipc/modal/ser
 import { useI18n } from 'vue-i18n'
 import { NAVIGATION_PANEL_URL } from '../navigationPanelConstants'
 
-//@ts-ignore
-const connectionManager: FrontendConnectionManagerIpc = window.connectionManager
-//@ts-ignore
-const modalManager: FrontendModalManagerIpc = window.modalManager
+const connectionManager: FrontendConnectionManagerIpc = window.labConnectionManager
+const modalManager: FrontendModalManagerIpc = window.labModalManager
 
 const { t } = useI18n()
 

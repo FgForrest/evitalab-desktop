@@ -1,0 +1,4 @@
+export const servicingNotificationManagerIpc_onNotificationCreated = 'servicingNotificationManager:onNotificationCreated'
+export const servicingNotificationManagerIpc_onNotificationClosureRequested = 'servicingNotificationManager:onNotificationClosureRequested'
+export const servicingNotificationManagerIpc_notificationClicked = 'servicingNotificationManager:notificationClicked'
+export const servicingNotificationManagerIpc_notificationClosed = 'servicingNotificationManager:notificationClosed'

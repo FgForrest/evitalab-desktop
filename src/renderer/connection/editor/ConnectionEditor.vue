@@ -15,6 +15,7 @@ import { useI18n } from 'vue-i18n'
 import ky from 'ky'
 import VColorSelect from '../../common/component/VColorSelect.vue'
 import ModalWindow from '../../common/component/ModalWindow.vue'
+import { Toaster, useToaster } from '../../notification/service/Toaster'
 
 enum ConnectionTestResult {
     NotTested,
@@ -22,14 +23,10 @@ enum ConnectionTestResult {
     Failure
 }
 
-//@ts-ignore
-const connectionManager: FrontendConnectionManagerIpc = window.connectionManager
-//@ts-ignore
-const modalManager: FrontendModalManagerIpc = window.modalManager
-//@ts-ignore
-const driverManager: FrontendDriverManagerIpc = window.driverManager
-// todo lho impl
-// const toaster: Toaster = useToaster()
+const connectionManager: FrontendConnectionManagerIpc = window.labConnectionManager
+const modalManager: FrontendModalManagerIpc = window.labModalManager
+const driverManager: FrontendDriverManagerIpc = window.labDriverManager
+const toaster: Toaster = useToaster()
 const { t } = useI18n()
 
 const connectionId = ref<ConnectionId | undefined>(undefined)
@@ -118,8 +115,6 @@ const serverUrlRules = [
 async function testConnection(serverUrl: string): Promise<string | undefined> {
     connectionTesting.value = true
     try {
-        // todo lho this should be returned by driver with conversion depended
-        //  on server version, but we don't want to cache every connection
         const normalizedUrl: string = serverUrl.endsWith('/') ? serverUrl : serverUrl + '/'
         const serverStatus: any = await ky.post(
             `${normalizedUrl}io.evitadb.externalApi.grpc.generated.EvitaManagementService/ServerStatus`,
@@ -139,10 +134,6 @@ async function testConnection(serverUrl: string): Promise<string | undefined> {
         if (serverStatus.api.lab?.enabled !== true) {
             return t('connection.editor.form.serverUrl.validations.labApiMissing')
         }
-        // if (!(serverStatus.api.lab?.baseUrl as string[] || []).includes(`${serverUrl}lab/`)) {
-        //     return t('connection.editor.form.serverUrl.validations.notLabUrl')
-        // }
-        // todo lho test all enabled apis?
         if (serverStatus.api.gRPC?.enabled !== true) {
             return t('connection.editor.form.serverUrl.validations.grpcApiMissing')
         }
@@ -151,8 +142,6 @@ async function testConnection(serverUrl: string): Promise<string | undefined> {
         return undefined
     } catch (e) {
         connectionTesting.value = false
-
-        // todo lho catch selfsigned certificate and redirect to the url
         return t('connection.editor.form.serverUrl.validations.unreachable')
     }
 }
@@ -198,9 +187,12 @@ async function save(): Promise<boolean> {
             await driverManager.downloadDriver(finalDriverVersion)
             downloadingDriver.value = false
         } catch (e) {
-            // todo lho toaster impl
+            await toaster.error(t(
+                'connection.editor.notification.couldNotDownloadDriver',
+                { reason: e.message }
+            ), e)
             downloadingDriver.value = false
-            return
+            return false
         }
 
         if (isNew.value) {
@@ -214,11 +206,15 @@ async function save(): Promise<boolean> {
                     color: finalColor
                 }
             })
+
+            await toaster.success(t(
+                'connection.editor.notification.connectionAdded',
+                { connectionName: connectionName.value }
+            ))
         } else {
             const existingConnection: ConnectionDto | undefined = await connectionManager.getConnection(connectionId.value)
             if (existingConnection == undefined) {
-                // todo lho toaster
-                throw new Error(`Cannot find existing connection for id ${connectionId.value}.`)
+                throw new Error(`Could not find existing connection for id ${connectionId.value}.`)
             }
             existingConnection.name = connectionName.value
             existingConnection.serverUrl = serverUrl.value
@@ -226,17 +222,21 @@ async function save(): Promise<boolean> {
             existingConnection.styling.shortName = finalShortConnectionName
             existingConnection.styling.color = finalColor
             connectionManager.storeConnection(existingConnection)
+
+            await toaster.success(t(
+                'connection.editor.notification.connectionUpdated',
+                { connectionName: connectionName.value }
+            ))
         }
+
+        return true
     } catch (e: any) {
-        // todo lho impl
-        // toaster.error(t(
-        //     'explorer.connection.connect.notification.couldNotAddConnection',
-        //     { reason: e.message }
-        // ))
+        await toaster.error(t(
+            'connection.editor.notification.couldNotSaveConnection',
+            { reason: e.message }
+        ), e)
         return false
     }
-
-    reset()
 }
 
 function reset(): void {
@@ -318,7 +318,6 @@ function handleVisibilityChange(visible: boolean): void {
                     :append-inner-icon="connectionTestResultIndicator"
                 />
 
-                <!--                        todo lho disable if serverUrl not valid instead-->
                 <DriverSelect
                     v-model="driverVersion"
                     @update:latest-available-driver-version="latestAvailableDriverVersion = $event"

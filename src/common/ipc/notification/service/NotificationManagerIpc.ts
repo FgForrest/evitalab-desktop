@@ -1,0 +1,4 @@
+export const notificationManagerIpc_addNotification = 'notificationManager:addNotification'
+export const notificationManagerIpc_requestNotificationClosure = 'notificationManager:requestNotificationClosure'
+export const notificationManagerIpc_onNotificationClicked = 'notificationManager:onNotificationClicked'
+export const notificationManagerIpc_onNotificationClosed = 'notificationManager:onNotificationClosed'

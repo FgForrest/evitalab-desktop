@@ -5,11 +5,11 @@
 
 import { useI18n } from 'vue-i18n'
 import { ManageOptionType } from '../model/ManageOptionType'
+import { Toaster, useToaster } from '../../notification/service/Toaster'
 
+const toaster: Toaster = useToaster()
 const { t } = useI18n()
 
-// todo convert to VList component and add key board shortcut to keymap
-// todo lho think about how to transform it into MenuAction items
 const options = [
     { type: 'subheader', title: t(`navigation.panel.manage.evitaLabHelp.title`) },
     {
@@ -64,7 +64,7 @@ const options = [
     },
 ]
 
-function handleOptionClick(selected: any): void {
+async function handleOptionClick(selected: any): Promise<void> {
     if (selected.length > 0) {
         const option: ManageOptionType = selected[0] as ManageOptionType
         switch (option) {
@@ -94,8 +94,7 @@ function handleOptionClick(selected: any): void {
                 window.open('https://github.com/FgForrest/evitaDB/issues', '_blank');
                 break
             default:
-                // todo lho impl
-                // toaster.error(new UnexpectedError(`Unknown manage option ${selected[0]}`))
+                await toaster.error(`Unknown manage option ${selected[0]}`)
         }
     }
 }

@@ -18,16 +18,19 @@ export class InstanceManager {
     private _skeletonWindow: BrowserWindow | undefined = undefined
     private readonly driverManager: DriverManager
 
-    private readonly instances: Map<ConnectionId, WebContentsView>
+    private readonly instances: Map<ConnectionId, WebContentsView> = new Map()
     private activeInstance: ConnectionId | undefined
 
     constructor(driverManager: DriverManager) {
         this.driverManager = driverManager
-        this.instances = new Map()
     }
 
-    set skeletonWindow(skeletonWindow: BrowserWindow) {
+    set skeletonWindow(skeletonWindow: BrowserWindow | undefined) {
         this._skeletonWindow = skeletonWindow
+        if (skeletonWindow != undefined) {
+            this.instances.forEach((instance) =>
+                this.registerSkeletonListenersForInstance(instance))
+        }
     }
 
     async activateInstance(connection: Connection | undefined): Promise<void> {
@@ -58,6 +61,8 @@ export class InstanceManager {
 
         if (connection != undefined) {
             const newInstance: WebContentsView = this.instances.get(connection.id)
+            // set bounds to current skeleton, the skeleton instance may have changed
+            newInstance.setBounds(this.constructViewBounds())
             this._skeletonWindow.contentView.addChildView(newInstance, 0) // adding it under every modal window
             newInstance.setVisible(true)
             this.activeInstance = connection.id
@@ -79,23 +84,15 @@ export class InstanceManager {
         instance.setBounds(this.constructViewBounds());
         instance.setVisible(false)
 
-        const resizer = debounce(
-            () => instance.setBounds(this.constructViewBounds()),
-            50
-        )
-        this._skeletonWindow.on('resize', resizer)
-        this._skeletonWindow.on('maximize', resizer)
-        this._skeletonWindow.on('unmaximize', resizer)
-        this._skeletonWindow.on('enter-full-screen', resizer)
-        this._skeletonWindow.on('leave-full-screen', resizer)
+        this.registerSkeletonListenersForInstance(instance)
 
         await instance.webContents.loadFile(driver.executablePath, this.constructInstanceUrlOptions(connection))
 
         // manually uncomment for devtools
         // instance.webContents.openDevTools()
 
-        this._skeletonWindow.contentView.addChildView(instance, 0) // adding it under every modal window
         this.instances.set(connection.id, instance)
+        this._skeletonWindow.contentView.addChildView(instance, 0) // adding it under every modal window
     }
 
     private destroyInstance(connection: Connection): void {
@@ -110,6 +107,18 @@ export class InstanceManager {
             const currentInstance: WebContentsView = this.instances.get(this.activeInstance)
             currentInstance.setVisible(false)
         }
+    }
+
+    private registerSkeletonListenersForInstance(instance: WebContentsView): void {
+        const resizer = debounce(
+            () => instance.setBounds(this.constructViewBounds()),
+            50
+        )
+        this._skeletonWindow.on('resize', resizer)
+        this._skeletonWindow.on('maximize', resizer)
+        this._skeletonWindow.on('unmaximize', resizer)
+        this._skeletonWindow.on('enter-full-screen', resizer)
+        this._skeletonWindow.on('leave-full-screen', resizer)
     }
 
     private constructInstanceUrlOptions(connection: Connection): LoadFileOptions {

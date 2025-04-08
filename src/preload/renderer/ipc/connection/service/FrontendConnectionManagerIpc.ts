@@ -31,7 +31,7 @@ export interface FrontendConnectionManagerIpc {
  * Implementation of connection manager IPC for frontend renderer.
  */
 export function exposeFrontendConnectionManagerIpc(): void {
-    contextBridge.exposeInMainWorld('connectionManager', {
+    contextBridge.exposeInMainWorld('labConnectionManager', {
         // todo lho use invoke everywhere so i can await the response (that it is processed?)
         activateConnection(connectionId: ConnectionId | undefined): void {
             ipcRenderer.send(connectionManagerIpc_activateConnection, connectionId)
