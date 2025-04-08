@@ -11,8 +11,7 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
-//@ts-ignore
-const driverManager: FrontendDriverManagerIpc = window.driverManager
+const driverManager: FrontendDriverManagerIpc = window.labDriverManager
 
 const props = withDefaults(
     defineProps<{
@@ -96,7 +95,7 @@ async function resolveLatestAvailableDriver(): Promise<void> {
             try {
                 latestAvailableDriver.value = await driverManager.resolveLatestAvailableDriver(props.serverUrl)
             } catch (e) {
-                // todo lho impl toaster
+                // todo lho toaster after debounce function is applied
                 console.error(e)
                 // server probably not reachable
                 latestAvailableDriver.value = undefined

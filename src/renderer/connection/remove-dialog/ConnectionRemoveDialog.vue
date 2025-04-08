@@ -8,15 +8,15 @@ import {
     FrontendConnectionManagerIpc
 } from '../../../preload/renderer/ipc/connection/service/FrontendConnectionManagerIpc'
 import { ConnectionId } from '../../../main/connection/model/ConnectionId'
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { ConnectionDto } from '../../../common/ipc/connection/model/ConnectionDto'
 import { useI18n } from 'vue-i18n'
+import { Toaster, useToaster } from '../../notification/service/Toaster'
 
-//@ts-ignore
-const connectionManager: FrontendConnectionManagerIpc = window.connectionManager
-//@ts-ignore
-const modalManager: FrontendModalManagerIpc = window.modalManager
+const connectionManager: FrontendConnectionManagerIpc = window.labConnectionManager
+const modalManager: FrontendModalManagerIpc = window.labModalManager
 
+const toaster: Toaster = useToaster()
 const { t } = useI18n()
 
 const connectionId = ref<ConnectionId | undefined>(undefined)
@@ -48,23 +48,19 @@ modalManager.onModalArgsPassed(async (url: string, args: any[]) => {
 async function removeConnection(): Promise<boolean> {
     try {
         connectionManager.removeConnection(connectionId.value)
-        // todo lho impl
-        // toaster.success(t(
-        //     'explorer.connection.remove.notification.connectionRemoved',
-        //     {
-        //         connectionName: connection.value.name
-        //     }
-        // ))
+        await toaster.success(t(
+            'connection.removeDialog.notification.connectionRemoved',
+            { connectionName: connection.value.name }
+        ))
         return true
     } catch (e: any) {
-        // todo lho impl
-        // toaster.error(t(
-        //     'explorer.connection.remove.notification.couldNotRemoveConnection',
-        //     {
-        //         connectionName: connection.value.name,
-        //         reason: e.message
-        //     }
-        // ))
+        await toaster.error(t(
+            'connection.removeDialog.notification.couldNotRemoveConnection',
+            {
+                connectionName: connection.value.name,
+                reason: e.message
+            }
+        ), e)
         return false
     }
 }

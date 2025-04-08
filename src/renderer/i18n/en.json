@@ -143,6 +143,12 @@
       "button": {
         "downloadingDriver": "Downloading driver..."
       },
+      "notification": {
+        "connectionAdded": "The {connectionName} connection has been successfully added.",
+        "connectionUpdated": "The {connectionName} connection has been successfully updated.",
+        "couldNotSaveConnection": "Could not save the connection: {reason}",
+        "couldNotDownloadDriver": "Could not download selected driver: {reason}"
+      },
       "driverSelect": {
         "usedDriver": {
           "label": "Used driver",

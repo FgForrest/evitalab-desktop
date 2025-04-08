@@ -6,8 +6,7 @@ import ModalWindow from '../common/component/ModalWindow.vue'
 import Header from './component/Header.vue'
 import Footer from './component/Footer.vue'
 
-//@ts-ignore
-const modalManager: FrontendModalManagerIpc = window.modalManager
+const modalManager: FrontendModalManagerIpc = window.labModalManager
 
 function closeNavigationPanel(): void {
     modalManager.closeModal(NAVIGATION_PANEL_URL)

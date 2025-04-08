@@ -18,7 +18,7 @@ export interface FrontendModalManagerIpc {
  * Implementation of modal manager IPC for frontend renderer.
  */
 export function exposeFrontendModalManagerIpc(): void {
-    contextBridge.exposeInMainWorld('modalManager', {
+    contextBridge.exposeInMainWorld('labModalManager', {
         openModal(url: string, ...args: any[]): void {
             ipcRenderer.send(modalManagerIpc_openModal, [url, ...args])
         },

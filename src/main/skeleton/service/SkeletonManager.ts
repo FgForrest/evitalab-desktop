@@ -11,8 +11,6 @@ export class SkeletonManager {
     private _skeletonWindow: BrowserWindow | undefined = undefined
 
     async init(): Promise<BrowserWindow> {
-        // todo lho we should handle multiple windows somehow
-
         const skeletonWindow = new BrowserWindow({
             width: 1280,
             height: 720,
@@ -28,6 +26,7 @@ export class SkeletonManager {
         } else {
             await skeletonWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}${SKELETON_PATH}`))
         }
+
         // manually uncomment for devtools
         // skeletonWindow.webContents.openDevTools({ mode: 'detach' })
 

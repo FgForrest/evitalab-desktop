@@ -24,22 +24,24 @@ export class ModalManager extends EventEmitter {
 
     private _skeletonWindow: BrowserWindow | undefined = undefined
 
-    private readonly initializedModals: Map<string, WebContentsView>
+    private readonly initializedModals: Map<string, WebContentsView> = new Map()
 
     constructor() {
         super()
-        this.initializedModals = new Map()
     }
 
     get modals(): List<WebContentsView> {
         return List(this.initializedModals.values())
     }
 
-    set skeletonWindow(skeletonWindow: BrowserWindow) {
+    set skeletonWindow(skeletonWindow: BrowserWindow | undefined) {
         this._skeletonWindow = skeletonWindow
+        if (skeletonWindow != undefined) {
+            this.initializedModals.forEach((modal) =>
+                this.registerSkeletonListenersForModal(modal))
+        }
     }
 
-    // todo lho nice urls like evitalab:navigation-panel ???
     async openModal(url: string, args: any[]): Promise<void> {
         await this.initModal(url)
         this.showModal(url, args)
@@ -66,15 +68,7 @@ export class ModalManager extends EventEmitter {
         newModal.setBounds(this.constructViewBounds());
         newModal.setVisible(false)
 
-        const resizer = debounce(
-            () => newModal.setBounds(this.constructViewBounds()),
-            50
-        )
-        this._skeletonWindow.on('resize', resizer)
-        this._skeletonWindow.on('maximize', resizer)
-        this._skeletonWindow.on('unmaximize', resizer)
-        this._skeletonWindow.on('enter-full-screen', resizer)
-        this._skeletonWindow.on('leave-full-screen', resizer)
+        this.registerSkeletonListenersForModal(newModal)
 
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
             await newModal.webContents.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL + `${MODAL_WINDOW_BASE_PATH}${url}`);
@@ -85,8 +79,11 @@ export class ModalManager extends EventEmitter {
         // manually uncomment for devtools
         // newModal.webContents.openDevTools()
 
-        this._skeletonWindow.contentView.addChildView(newModal)
         this.initializedModals.set(url, newModal)
+        this._skeletonWindow.contentView.addChildView(
+            newModal,
+            this.calculateModalPriorityInSkeleton()
+        )
     }
 
     private showModal(url: string, args: any[]): void {
@@ -95,8 +92,13 @@ export class ModalManager extends EventEmitter {
         // pass arguments before the modal is shown
         this.emit(MODAL_MANAGER_EMIT_MODAL_ARGS_PASS, modal, [url, ...args])
 
+        // set bounds to current skeleton, the skeleton instance may have changed
+        modal.setBounds(this.constructViewBounds())
         // rearranges the existing child view to be the top most child
-        this._skeletonWindow.contentView.addChildView(modal)
+        this._skeletonWindow.contentView.addChildView(
+            modal,
+            this.calculateModalPriorityInSkeleton()
+        )
 
         // show the modal
         this.notifyModalVisibilityChange(modal, url, true)
@@ -119,6 +121,23 @@ export class ModalManager extends EventEmitter {
             throw new Error(`No modal for URL '${url}' initialized.`)
         }
         return modal
+    }
+
+    private registerSkeletonListenersForModal(modal: WebContentsView): void {
+        const resizer = debounce(
+            () => modal.setBounds(this.constructViewBounds()),
+            50
+        )
+        this._skeletonWindow.on('resize', resizer)
+        this._skeletonWindow.on('maximize', resizer)
+        this._skeletonWindow.on('unmaximize', resizer)
+        this._skeletonWindow.on('enter-full-screen', resizer)
+        this._skeletonWindow.on('leave-full-screen', resizer)
+    }
+
+    private calculateModalPriorityInSkeleton(): number {
+        // we want to add it instead of the top most view - notification panel - but still be under it
+        return this._skeletonWindow.contentView.children.length - 1
     }
 
     private constructViewBounds(): Rectangle {

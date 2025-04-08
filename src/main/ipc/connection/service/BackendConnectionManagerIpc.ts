@@ -23,27 +23,11 @@ import { ConnectionStyling } from '../../../connection/model/ConnectionStyling'
 import { ConnectionStylingDto } from '../../../../common/ipc/connection/model/ConnectionStylingDto'
 
 /**
- * Implementation of connection manager IPC for backend.
- */
-export class BackendConnectionManagerIpc {
-
-    emitConnectionActivation(target: WebContents, connection: Connection | undefined): void {
-        target.send(connectionManagerIpc_onConnectionActivation, connection != undefined ? convertConnectionToDto(connection) : undefined)
-    }
-
-    emitConnectionsChange(target: WebContents, connections: Connection[]): void {
-        target.send(connectionManagerIpc_onConnectionsChange, connections.map(it => convertConnectionToDto(it)))
-    }
-}
-
-/**
  * Initializes implementation of connection manager IPC for backend.
  */
 export function initBackendConnectionManagerIpc(skeletonManager: SkeletonManager,
                                                 connectionManager: ConnectionManager,
-                                                modalManager: ModalManager): BackendConnectionManagerIpc {
-    const backendConnectionManagerIpc: BackendConnectionManagerIpc = new BackendConnectionManagerIpc()
-
+                                                modalManager: ModalManager): void {
     ipcMain.on(
         connectionManagerIpc_activateConnection,
         (event: IpcMainEvent, connectionId: ConnectionId | undefined) => {
@@ -136,27 +120,33 @@ export function initBackendConnectionManagerIpc(skeletonManager: SkeletonManager
     connectionManager.on(
         CONNECTION_MANAGER_EMIT_CONNECTION_ACTIVATION,
         (activatedConnection: Connection | undefined) => {
-            backendConnectionManagerIpc.emitConnectionActivation(
+            emitConnectionActivation(
                 skeletonManager.skeletonWindow.webContents,
                 activatedConnection
             )
             modalManager.modals.forEach(modal =>
-                backendConnectionManagerIpc.emitConnectionActivation(modal.webContents, activatedConnection))
+                emitConnectionActivation(modal.webContents, activatedConnection))
         }
     )
     connectionManager.on(
         CONNECTION_MANAGER_EMIT_CONNECTIONS_CHANGE,
         (connections: Connection[]) => {
-            backendConnectionManagerIpc.emitConnectionsChange(
+            emitConnectionsChange(
                 skeletonManager.skeletonWindow.webContents,
                 connections
             )
             modalManager.modals.forEach(modal =>
-                backendConnectionManagerIpc.emitConnectionsChange(modal.webContents, connections))
+                emitConnectionsChange(modal.webContents, connections))
         }
     )
+}
 
-    return backendConnectionManagerIpc
+function emitConnectionActivation(target: WebContents, connection: Connection | undefined): void {
+    target.send(connectionManagerIpc_onConnectionActivation, connection != undefined ? convertConnectionToDto(connection) : undefined)
+}
+
+function emitConnectionsChange(target: WebContents, connections: Connection[]): void {
+    target.send(connectionManagerIpc_onConnectionsChange, connections.map(it => convertConnectionToDto(it)))
 }
 
 function convertConnectionToDto(connection: Connection): ConnectionDto {

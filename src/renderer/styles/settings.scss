@@ -171,6 +171,11 @@ body::after {
 
 // toast notifications
 
+.Vue-Toastification__toast {
+  // this is because we cannot simply support dynamic toast dimensions so we want to display as much content as possible
+  width: 37rem; // max width from toastification
+}
+
 .Vue-Toastification__icon {
   height: 1.625rem;
   font-size: 1.5rem;
@@ -178,50 +183,50 @@ body::after {
 }
 
 .Vue-Toastification__toast--success {
-  background-color: #1f3a38;
+  background-color: #1f3a38 !important;
 
   .Vue-Toastification__icon {
-    color: colors.$success;
+    color: colors.$success !important;
   }
 
   .Vue-Toastification__progress-bar {
-    background-color: colors.$success;
+    background-color: colors.$success !important;
   }
 }
 
 .Vue-Toastification__toast--info {
-  background-color: #23355c;
+  background-color: #23355c !important;
 
   .Vue-Toastification__icon {
-    color: colors.$info;
+    color: colors.$info !important;
   }
 
   .Vue-Toastification__progress-bar {
-    background-color: colors.$info;
+    background-color: colors.$info !important;
   }
 }
 
 .Vue-Toastification__toast--warning {
-  background-color: #4c4029;
+  background-color: #4c4029 !important;
 
   .Vue-Toastification__icon {
-    color: colors.$warning;
+    color: colors.$warning !important;
   }
 
   .Vue-Toastification__progress-bar {
-    background-color: colors.$warning;
+    background-color: colors.$warning !important;
   }
 }
 
 .Vue-Toastification__toast--error {
-  background-color: #4c232f;
+  background-color: #4c232f !important;
 
   .Vue-Toastification__icon {
-    color: colors.$error;
+    color: colors.$error !important;
   }
 
   .Vue-Toastification__progress-bar {
-    background-color: colors.$error;
+    background-color: colors.$error !important;
   }
 }
 // Overlay

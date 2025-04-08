@@ -13,16 +13,17 @@ import {
 import { FrontendModalManagerIpc } from '../../../preload/renderer/ipc/modal/service/FrontendModalManagerIpc'
 import { ConnectionDto } from '../../../common/ipc/connection/model/ConnectionDto'
 
-//@ts-ignore
-const connectionManager: FrontendConnectionManagerIpc = window.connectionManager
-//@ts-ignore
-const modalManager: FrontendModalManagerIpc = window.modalManager
+const connectionManager: FrontendConnectionManagerIpc = window.labConnectionManager
+const modalManager: FrontendModalManagerIpc = window.labModalManager
 
 const activatedConnections = ref<ConnectionId[]>([])
 connectionManager.getActiveConnection()
     .then(it => {
-        console.log(it)
-        activatedConnections.value = [it.id]
+        if (it == undefined) {
+            activatedConnections.value = []
+        } else {
+            activatedConnections.value = [it.id]
+        }
     })
 
 const connections = ref<ConnectionDto[]>([])

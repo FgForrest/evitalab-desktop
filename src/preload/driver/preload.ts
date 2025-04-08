@@ -1,1 +1,3 @@
-// there will be APIs for drivers
+import { exposeFrontendNotificationManagerIpc } from './ipc/notification/service/FrontendNotificationManagerIpc'
+
+exposeFrontendNotificationManagerIpc()

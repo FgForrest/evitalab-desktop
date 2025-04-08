@@ -8,8 +8,7 @@ import { useI18n } from 'vue-i18n'
 import { ref } from 'vue'
 import { CONNECTION_REMOVE_DIALOG_URL } from '../../connection/remove-dialog/connectionRemoveDialogConstants'
 
-//@ts-ignore
-const modalManager: FrontendModalManagerIpc = window.modalManager
+const modalManager: FrontendModalManagerIpc = window.labModalManager
 
 const { t } = useI18n()
 

@@ -18,6 +18,8 @@ import {
 import { initBackendModalManagerIpc } from './ipc/modal/service/BackendModalManagerIpc'
 import { initBackendDriverManagerIpc } from './ipc/driver/service/BackendDriverManagerIpc'
 import menu from './menu'
+import { NotificationManager } from './notification/service/NotificationManager'
+import { initBackendNotificationManagerIpc } from './ipc/notification/service/BackendNotificationManagerIpc'
 
 /**
  * Entrypoint of evitaLab app. Initializes the entire app.
@@ -36,10 +38,25 @@ export async function initialize(): Promise<void> {
     // initialize managers
     const appConfig: AppConfig = new AppConfig()
     const skeletonManager: SkeletonManager = new SkeletonManager()
+    const notificationManager: NotificationManager = new NotificationManager()
     const modalManager: ModalManager = new ModalManager()
     const connectionManager: ConnectionManager = new ConnectionManager(appConfig)
     const driverManager: DriverManager = new DriverManager()
     const instanceManager: InstanceManager = new InstanceManager(driverManager)
+
+    // interconnect managers
+    connectionManager.on(
+        CONNECTION_MANAGER_EMIT_CONNECTION_ACTIVATION,
+        (activatedConnection: Connection | undefined) => {
+            instanceManager.activateInstance(activatedConnection)
+        }
+    )
+    connectionManager.on(
+        CONNECTION_MANAGER_EMIT_CONNECTION_CHANGE,
+        (connection: Connection) => {
+            instanceManager.restartInstance(connection)
+        }
+    )
 
     // This method will wait for Electron until it has finished
     // initialization and is ready to create browser windows.
@@ -48,10 +65,12 @@ export async function initialize(): Promise<void> {
     log.log('Electron app ready.')
 
     // initialize structure
+    initBackendNotificationManagerIpc(notificationManager)
     initBackendConnectionManagerIpc(skeletonManager, connectionManager, modalManager)
     initBackendModalManagerIpc(modalManager)
     initBackendDriverManagerIpc(driverManager)
-    await initSkeleton(skeletonManager, modalManager, connectionManager, instanceManager)
+    await initSkeleton(skeletonManager, notificationManager, modalManager, connectionManager, instanceManager)
+    await notificationManager.init()
     await modalManager.initModal(NAVIGATION_PANEL_URL)
 
     log.log('App structure initialized.')
@@ -69,7 +88,7 @@ export async function initialize(): Promise<void> {
         // On OS X it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
         if (BrowserWindow.getAllWindows().length === 0) {
-            await initSkeleton(skeletonManager, modalManager, connectionManager, instanceManager);
+            await initSkeleton(skeletonManager, notificationManager, modalManager, connectionManager, instanceManager);
         }
     });
 
@@ -81,26 +100,22 @@ export async function initialize(): Promise<void> {
 }
 
 async function initSkeleton(skeletonManager: SkeletonManager,
+                            notificationManager: NotificationManager,
                             modalManager: ModalManager,
                             connectionManager: ConnectionManager,
                             instanceManager: InstanceManager): Promise<void> {
     const skeletonWindow: BrowserWindow = await skeletonManager.init()
 
-    instanceManager.skeletonWindow = skeletonWindow
+    // notification manager needs to know first to properly allocate space for the notification panel in
+    // parent skeleton view
+    notificationManager.skeletonWindow = skeletonWindow
     modalManager.skeletonWindow = skeletonWindow
+    instanceManager.skeletonWindow = skeletonWindow
 
-    skeletonWindow.on('close', () => connectionManager.activateConnection(undefined))
-
-    connectionManager.on(
-        CONNECTION_MANAGER_EMIT_CONNECTION_ACTIVATION,
-        (activatedConnection: Connection | undefined) => {
-            instanceManager.activateInstance(activatedConnection)
-        }
-    )
-    connectionManager.on(
-        CONNECTION_MANAGER_EMIT_CONNECTION_CHANGE,
-        (connection: Connection) => {
-            instanceManager.restartInstance(connection)
-        }
-    )
+    skeletonWindow.on('close', () => {
+        connectionManager.activateConnection(undefined)
+        notificationManager.skeletonWindow = undefined
+        modalManager.skeletonWindow = undefined
+        instanceManager.skeletonWindow = undefined
+    })
 }
