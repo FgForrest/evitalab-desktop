@@ -71,7 +71,7 @@ async function handleOptionClick(selected: any): Promise<void> {
             case ManageOptionType.EvitaLabGithub:
                 // it would be confused for users to distinguish between desktop app and driver app, that why we direct
                 // them to desktop app
-                window.open('https://github.com/lukashornych/evitalab-desktop', '_blank');
+                window.open('https://github.com/FgForrest/evitalab-desktop', '_blank');
                 break
             case ManageOptionType.DiscussEvitaLab:
                 window.open('https://discord.gg/VsNBWxgmSw', '_blank');
@@ -79,7 +79,7 @@ async function handleOptionClick(selected: any): Promise<void> {
             case ManageOptionType.ReportEvitaLabIssue:
                 // it would be confused for users to distinguish between desktop app and driver app, that why we direct
                 // them to desktop app
-                window.open('https://github.com/lukashornych/evitalab-desktop/issues', '_blank');
+                window.open('https://github.com/FgForrest/evitalab-desktop/issues', '_blank');
                 break
             case ManageOptionType.EvitaDBDocumentation:
                 window.open('https://evitadb.io/documentation', '_blank');

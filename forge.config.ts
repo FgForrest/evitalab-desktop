@@ -30,7 +30,7 @@ const config: ForgeConfig = {
                 icon: 'public/icon/icon.png',
                 description: 'evitaDB Desktop Client',
                 categories: ['Development'],
-                homepage: 'https://github.com/lukashornych/evitalab-desktop'
+                homepage: 'https://github.com/FgForrest/evitalab-desktop'
             }
         }),
         new MakerDeb({
@@ -39,7 +39,7 @@ const config: ForgeConfig = {
                 icon: 'public/icon/icon.png',
                 description: 'evitaDB Desktop Client',
                 maintainer: 'Lukáš Hornych',
-                homepage: 'https://github.com/lukashornych/evitalab-desktop',
+                homepage: 'https://github.com/FgForrest/evitalab-desktop',
                 categories: ['Development'],
                 section: 'database'
             }

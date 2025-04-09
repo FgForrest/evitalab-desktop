@@ -42,7 +42,7 @@ welcomeScreenManager.getBlogPosts().then((posts) => {
                     <div class="editor-welcome-screen-hero__title">
                         <h1 class="font-weight-bold mb-2" style="font-size: 4.375rem;">{{ t('app.name') }}</h1>
                         <p class="text-white" style="font-size: 1rem;">{{ version }} <a
-                            class="text-primary-lightest text-body-2" href="https://github.com/lukashornych/evitalab-desktop/releases"
+                            class="text-primary-lightest text-body-2" href="https://github.com/FgForrest/evitalab-desktop/releases"
                             target="_blank">({{ t('welcomeScreen.changelog') }})</a></p>
                         <p class="text-gray-light" style="font-size: 1rem;">{{ t('welcomeScreen.description') }}</p>
                     </div>
@@ -84,7 +84,7 @@ welcomeScreenManager.getBlogPosts().then((posts) => {
                     </I18nT>
                     <I18nT keypath="welcomeScreen.link.evitaLabGitHub.text" tag="li">
                         <template #link>
-                            <a href="https://github.com/lukashornych/evitalab/" target="_blank">{{ t('welcomeScreen.link.evitaLabGitHub.link') }}</a>
+                            <a href="https://github.com/FgForrest/evitalab-desktop/" target="_blank">{{ t('welcomeScreen.link.evitaLabGitHub.link') }}</a>
                         </template>
                     </I18nT>
                     <I18nT keypath="welcomeScreen.link.discord.text" tag="li">
@@ -93,7 +93,7 @@ welcomeScreenManager.getBlogPosts().then((posts) => {
                         </template>
                     </I18nT>
                     <li>
-                        <a href="https://github.com/lukashornych/evitalab/issues" target="_blank">
+                        <a href="https://github.com/FgForrest/evitalab-desktop/issues" target="_blank">
                             {{ t('welcomeScreen.link.submitIssue') }}
                         </a>
                     </li>

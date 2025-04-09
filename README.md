@@ -1,5 +1,5 @@
 <h1 align="center" style="border-bottom: none">
-    <a href="https://evitadb.io" target="_blank"><img src="https://raw.githubusercontent.com/lukashornych/evitalab-desktop/dev/documentation/user/assets/img/evitalab.svg"/></a><br>evitaLab Desktop
+    <a href="https://evitadb.io" target="_blank"><img src="https://raw.githubusercontent.com/FgForrest/evitalab-desktop/dev/documentation/user/assets/img/evitalab.svg"/></a><br>evitaLab Desktop
 </h1>
 
 <p align="center">
@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/lukashornych/evitalab-desktop/releases" title="Releases"><img src="https://img.shields.io/github/v/release/lukashornych/evitalab-desktop?color=%23ff00a0&include_prereleases&label=version&sort=semver"/></a>
+  <a href="https://github.com/FgForrest/evitalab-desktop/releases" title="Releases"><img src="https://img.shields.io/github/v/release/FgForrest/evitalab-desktop?color=%23ff00a0&include_prereleases&label=version&sort=semver"/></a>
   &nbsp;
   <a href="https://vuejs.org/" title="Built with Electron"><img src="https://img.shields.io/badge/Built%20with-Electron-green?color=9EEAF9"/></a>
   &nbsp;
@@ -17,7 +17,7 @@
   &nbsp;
   <a href="https://discord.gg/VsNBWxgmSw" title="Discord"><img src="https://img.shields.io/discord/999338870996992223?color=5865f2"/></a>
   &nbsp;
-  <a href="https://github.com/lukashornych/evitalab-desktop/blob/master/LICENSE" title="License"><img src="https://img.shields.io/github/license/lukashornych/evitalab-desktop"/></a>
+  <a href="https://github.com/FgForrest/evitalab-desktop/blob/master/LICENSE" title="License"><img src="https://img.shields.io/github/license/FgForrest/evitalab-desktop"/></a>
 </p>
 
 evitaLab Desktop aims to provide a user-friendly local desktop client for evitaDB database to easily browse and modify 
@@ -56,7 +56,7 @@ However, evitaLab Desktop and evitaLab core are still in active development and 
 
 ## evitaLab Desktop vs evitaLab
 
-evitaLab Desktop is **not** a replacement for the [evitaLab](https://github.com/lukashornych/evitalab). Instead, it builds on top of the evitaLab.
+evitaLab Desktop is **not** a replacement for the [evitaLab](https://github.com/FgForrest/evitalab). Instead, it builds on top of the evitaLab.
 
 The evitaLab core is the main heart. It handles opened tabs, consoles, viewers, connection explorer and so on. Basically
 everything that has to do with accessing evitaDB server data.
@@ -69,7 +69,7 @@ This way you can access different evitaDB server versions from a single app with
 
 ## Download
 
-Binaries will be available soon for all major platforms (Windows, Linux, macOS). You will find them in [releases](https://github.com/lukashornych/evitalab-desktop/releases).
+Binaries will be available soon for all major platforms (Windows, Linux, macOS). You will find them in [releases](https://github.com/FgForrest/evitalab-desktop/releases).
 
 _Note: evitaLab Desktop versioning is separate from the evitaLab core versioning. Just pick the newest desktop app version
 no matter your server version._
@@ -105,6 +105,6 @@ You can find more indepth info about internal structure and guidelines of evitaL
 
 ## Contribution
 
-Any contributions are welcome and appreciated. If you would like to contribute to evitaLab Desktop or the [evitaLab](https://github.com/lukashornych/evitalab) core, 
+Any contributions are welcome and appreciated. If you would like to contribute to evitaLab Desktop or the [evitaLab](https://github.com/FgForrest/evitalab) core, 
 feel free to open an issue and submit a pull request.
 

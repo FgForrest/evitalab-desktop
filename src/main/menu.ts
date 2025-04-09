@@ -104,7 +104,7 @@ const template: any = [
             {
                 label: 'evitaLab Issue Tracker',
                 click: async () => {
-                    await shell.openExternal('https://github.com/lukashornych/evitalab-desktop/issues')
+                    await shell.openExternal('https://github.com/FgForrest/evitalab-desktop/issues')
                 }
             },
             { type: 'separator' },

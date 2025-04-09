@@ -6,7 +6,7 @@ we use [Vite](https://vitejs.dev/) and [Yarn](https://yarnpkg.com/) package mana
 [Node.js](https://nodejs.org/en) can be found in `.nvmrc`.
 
 For the views UI, we use the [Vuetify](https://vuetifyjs.com/en/) framework with some design customizations to speed up the UI
-building process. The goal is to keep the UI stack as close as possible to the base [evitaLab](https://github.com/lukashornych/evitalab/blob/dev/documentation/developer/index.md).
+building process. The goal is to keep the UI stack as close as possible to the base [evitaLab](https://github.com/FgForrest/evitalab/blob/dev/documentation/developer/index.md).
 
 For more indepth knowledge, check these sections:
 
