@@ -25,8 +25,6 @@ data stored in multiple database instances.
 
 ![evitaLab Desktop preview](documentation/user/assets/img/preview.png)
 
-TODO LHO screenshot
-
 ## Features
 
 evitaLab Desktop allows you to:
