@@ -149,7 +149,7 @@ export class DriverManager {
                 const rawDriverData: string[] = rawDriver.split(/,/)
 
                 drivers.push(new Driver(
-                    rawDriverData[0].substring(1),
+                    rawDriverData[0],
                     rawDriverData[1]
                 ))
             }

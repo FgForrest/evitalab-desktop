@@ -77,7 +77,7 @@ export class ModalManager extends EventEmitter {
         }
 
         // manually uncomment for devtools
-        newModal.webContents.openDevTools()
+        // newModal.webContents.openDevTools()
 
         this.initializedModals.set(url, newModal)
         this._skeletonWindow.contentView.addChildView(
