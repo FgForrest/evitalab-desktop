@@ -54,6 +54,7 @@ watch(
     latestAvailableDriver,
     () => emit('update:latestAvailableDriverVersion', latestAvailableDriver.value?.version)
 )
+const errorDuringAvailableDriverResolution = ref<boolean>(false)
 
 const usedDriverTooOld = computed<boolean>(() => {
     if (usedDriver.value == undefined || latestAvailableDriver.value == undefined) {
@@ -86,6 +87,7 @@ const isNewestDriverApplied = computed<boolean>(() => {
 
 async function resolveLatestAvailableDriver(): Promise<void> {
     resolvingLatestAvailableDriver.value = true
+    errorDuringAvailableDriverResolution.value = false
 
     if (props.serverUrl == undefined || props.serverUrl.length === 0) {
         latestAvailableDriver.value = undefined
@@ -96,11 +98,13 @@ async function resolveLatestAvailableDriver(): Promise<void> {
                 latestAvailableDriver.value = await driverManager.resolveLatestAvailableDriver(props.serverUrl)
             } catch (e) {
                 // todo lho toaster after debounce function is applied
+                errorDuringAvailableDriverResolution.value = true
                 console.error(e)
                 // server probably not reachable
                 latestAvailableDriver.value = undefined
             }
         } catch (e) {
+            errorDuringAvailableDriverResolution.value = true
             // serverUrl not URL, abort
             latestAvailableDriver.value = undefined
         }
@@ -148,11 +152,15 @@ function chooseNewerDriver(): void {
             :label="t('connection.editor.driverSelect.latestAvailableDriver.label')"
             :placeholder="t('connection.editor.driverSelect.latestAvailableDriver.placeholder.noDriver')"
             :loading="resolvingLatestAvailableDriver"
+            :error="errorDuringAvailableDriverResolution"
+            :hint="errorDuringAvailableDriverResolution ? t('connection.editor.driverSelect.latestAvailableDriver.hint.couldNotResolve') : undefined"
+            :persistent-hint="errorDuringAvailableDriverResolution"
         >
             <template #prepend-inner>
                 <template v-if="resolvingLatestAvailableDriver">
                     <!-- note: loading is handled by the text field -->
                 </template>
+                <VIcon v-else-if="errorDuringAvailableDriverResolution" color="error">mdi-alert-circle-outline</VIcon>
                 <VIcon v-else-if="isNewerDriverAvailable" color="warning">mdi-alert-decagram-outline</VIcon>
                 <VIcon v-else-if="isNewestDriverApplied" color="success">mdi-check</VIcon>
             </template>

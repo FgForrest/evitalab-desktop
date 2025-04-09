@@ -160,6 +160,9 @@
           "label": "Latest available driver",
           "placeholder": {
             "noDriver": "No driver available"
+          },
+          "hint": {
+            "couldNotResolve": "Could not resolve latest available driver for defined server URL. Could not resolve server version."
           }
         }
       }

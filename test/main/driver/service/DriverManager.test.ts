@@ -117,7 +117,7 @@ async function createMockEvitaLabDatabaseEndpoint(): Promise<void> {
 
     fetchMock.mockGlobal()
         .get(
-            'https://raw.githubusercontent.com/lukashornych/evitalab-metadata-database/refs/heads/main/evitalab-database.csv',
+            'https://raw.githubusercontent.com/FgForrest/evitalab-metadata-database/refs/heads/main/evitalab-database.csv',
             mockEvitaLabDatabase
         )
 }

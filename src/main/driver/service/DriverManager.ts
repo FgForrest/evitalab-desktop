@@ -9,7 +9,7 @@ const updateDriverDatabaseAfterInMillis = 15 * 60 * 1000
 
 const shortCalendarVersionPattern = /^\d{4}\.\d{1,2}$/
 
-const driverDatabaseSourceUrl = 'https://raw.githubusercontent.com/lukashornych/evitalab-metadata-database/refs/heads/main/evitalab-database.csv'
+const driverDatabaseSourceUrl = 'https://raw.githubusercontent.com/FgForrest/evitalab-metadata-database/refs/heads/main/evitalab-database.csv'
 
 /**
  * Manages downloading and initializing drivers (individual evitaLab instances).
@@ -142,10 +142,14 @@ export class DriverManager {
             const rawDrivers: string[] = rawDriverDatabase.split(/\n/)
             for (let i = 1; i < rawDrivers.length; i++) {
                 const rawDriver: string = rawDrivers[i]
+                if (rawDriver.trim().length === 0) {
+                    continue
+                }
+
                 const rawDriverData: string[] = rawDriver.split(/,/)
 
                 drivers.push(new Driver(
-                    rawDriverData[0],
+                    rawDriverData[0].substring(1),
                     rawDriverData[1]
                 ))
             }
