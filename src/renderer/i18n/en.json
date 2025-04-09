@@ -97,6 +97,9 @@
             "edit": "Edit connection",
             "remove": "Remove connection"
           }
+        },
+        "notification": {
+          "couldNotActivateConnection": "Could not activate connection: {reason}"
         }
       }
     }
@@ -108,6 +111,12 @@
         "edit": "Edit connection"
       },
       "form": {
+        "serverFieldset": {
+          "label": "Server"
+        },
+        "connectionFieldset": {
+          "label": "Connection"
+        },
         "connectionName": {
           "label": "Connection name",
           "validations": {
@@ -144,6 +153,7 @@
         "downloadingDriver": "Downloading driver..."
       },
       "notification": {
+        "similarNamedConnectionExists": "Another connection with suggested name {suggestedConnectionName} already exists. Please define custom connection name.",
         "connectionAdded": "The {connectionName} connection has been successfully added.",
         "connectionUpdated": "The {connectionName} connection has been successfully updated.",
         "couldNotSaveConnection": "Could not save the connection: {reason}",

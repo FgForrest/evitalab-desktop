@@ -30,7 +30,6 @@ export class Connection {
         this.name = name
         this.serverUrl = serverUrl
         this.driverVersion = driverVersion
-        this.styling.shortName = styling.shortName
         this.styling.color = styling.color
     }
 

@@ -74,7 +74,6 @@ export interface ConnectionConfig {
 
 export interface ConnectionStylingConfig {
 
-    readonly shortName: string | undefined
     readonly color: string | undefined
 }
 

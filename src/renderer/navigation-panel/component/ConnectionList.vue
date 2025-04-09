@@ -10,15 +10,23 @@ import { FrontendConnectionManagerIpc } from '../../../preload/renderer/ipc/conn
 import { FrontendModalManagerIpc } from '../../../preload/renderer/ipc/modal/service/FrontendModalManagerIpc'
 import { useI18n } from 'vue-i18n'
 import { NAVIGATION_PANEL_URL } from '../navigationPanelConstants'
+import { Toaster, useToaster } from '../../notification/service/Toaster'
 
 const connectionManager: FrontendConnectionManagerIpc = window.labConnectionManager
 const modalManager: FrontendModalManagerIpc = window.labModalManager
 
+const toaster: Toaster = useToaster()
 const { t } = useI18n()
 
 const activatedConnections = ref<ConnectionId[]>([])
 connectionManager.getActiveConnection()
-    .then(it => activatedConnections.value = [it.id])
+    .then(it => {
+        if (it == undefined) {
+            activatedConnections.value = []
+        } else {
+            activatedConnections.value = [it.id]
+        }
+    })
 
 const connections = ref<ConnectionDto[]>([])
 connectionManager.getConnections()
@@ -36,12 +44,19 @@ connectionManager.onConnectionsChange((newConnections: ConnectionDto[]) =>
     connections.value = newConnections)
 
 function selectConnection(item: any): void {
-    if (!item.value) {
-        connectionManager.activateConnection(undefined)
-    } else {
-        connectionManager.activateConnection(item.id)
+    try {
+        if (!item.value) {
+            connectionManager.activateConnection(undefined)
+        } else {
+            connectionManager.activateConnection(item.id)
+        }
+        modalManager.closeModal(NAVIGATION_PANEL_URL)
+    } catch (e) {
+        toaster.error(t(
+            'navigation.panel.connection.notification.couldNotActivateConnection',
+            { reason: e.message }
+        ), e)
     }
-    modalManager.closeModal(NAVIGATION_PANEL_URL)
 }
 
 function addConnection(): void {

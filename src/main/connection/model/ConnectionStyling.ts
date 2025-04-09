@@ -3,11 +3,9 @@
  */
 export class ConnectionStyling {
 
-    shortName: string | undefined
     color: string | undefined
 
-    constructor(shortName: string | undefined, color: string | undefined) {
-        this.shortName = shortName
+    constructor(color: string | undefined) {
         this.color = color
     }
 }

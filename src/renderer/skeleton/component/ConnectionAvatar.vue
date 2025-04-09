@@ -9,9 +9,6 @@ const props = defineProps<{
 }>()
 
 const shortName = computed<string>(() => {
-    if (props.connection.styling.shortName != undefined) {
-        return props.connection.styling.shortName
-    }
     return computeShortConnectionName(props.connection.name)
 })
 </script>

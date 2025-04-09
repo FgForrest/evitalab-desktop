@@ -66,8 +66,6 @@ async function removeConnection(): Promise<boolean> {
 }
 
 function reset(): void {
-    close()
-
     connectionId.value = undefined
     connection.value = undefined
 }
@@ -97,7 +95,7 @@ function handleVisibilityChange(visible: boolean): void {
             <template #title>
                 <I18nT keypath="connection.removeDialog.title">
                     <template #connectionName>
-                        <strong>{{ connection.name }}</strong>
+                        <strong>{{ connection?.name }}</strong>
                     </template>
                 </I18nT>
             </template>

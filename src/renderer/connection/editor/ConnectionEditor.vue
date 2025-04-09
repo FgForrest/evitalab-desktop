@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { CONNECTION_EDITOR_URL } from './connectionEditorConstants'
 import { ConnectionId } from '../../../main/connection/model/ConnectionId'
 import {
@@ -8,14 +8,14 @@ import {
 import { FrontendModalManagerIpc } from '../../../preload/renderer/ipc/modal/service/FrontendModalManagerIpc'
 import { FrontendDriverManagerIpc } from '../../../preload/renderer/ipc/driver/service/FrontendDriverManagerIpc'
 import { ConnectionDto } from '../../../common/ipc/connection/model/ConnectionDto'
-import { computeShortConnectionName } from '../../../common/util/connection'
 import DriverSelect from '../../driver/component/DriverSelect.vue'
 import VFormDialog from '../../common/component/VFormDialog.vue'
 import { useI18n } from 'vue-i18n'
-import ky from 'ky'
 import VColorSelect from '../../common/component/VColorSelect.vue'
 import ModalWindow from '../../common/component/ModalWindow.vue'
 import { Toaster, useToaster } from '../../notification/service/Toaster'
+import debounce from '../../util/debounce'
+import { ServerMetadataProvider } from './service/ServerMetadataProvider'
 
 enum ConnectionTestResult {
     NotTested,
@@ -28,11 +28,9 @@ const modalManager: FrontendModalManagerIpc = window.labModalManager
 const driverManager: FrontendDriverManagerIpc = window.labDriverManager
 const toaster: Toaster = useToaster()
 const { t } = useI18n()
+const serverMetadataProvider: ServerMetadataProvider = new ServerMetadataProvider()
 
 const connectionId = ref<ConnectionId | undefined>(undefined)
-const connectionName = ref<string>('')
-const customShortConnectionName = ref<string>('')
-const computedShortConnectionName = computed<string>(() => computeShortConnectionName(connectionName.value))
 
 const serverUrl = ref<string>('')
 const connectionTesting = ref<boolean>(false)
@@ -51,6 +49,19 @@ const connectionTestResultIndicator = computed<string>(() => {
     }
 })
 
+const suggestedConnectionName = ref<string>('')
+watch(
+    serverUrl,
+    () => {
+        if (serverUrl.value != undefined && serverUrl.value.trim().length > 0) {
+            debouncedResolveSuggestedConnectionName()
+        } else {
+            suggestedConnectionName.value = ''
+        }
+    }
+)
+const customConnectionName = ref<string>('')
+
 const driverVersion = ref<string>('')
 const latestAvailableDriverVersion = ref<string>('')
 
@@ -59,7 +70,10 @@ const color = ref<string | undefined>(undefined)
 const isNew = computed<boolean>(() => connectionId.value == undefined)
 const downloadingDriver = ref<boolean>(false)
 const changed = computed<boolean>(() =>
-    (connectionName.value != undefined && connectionName.value.length > 0) &&
+    (
+        (suggestedConnectionName.value != undefined && suggestedConnectionName.value.length > 0) ||
+        (customConnectionName.value != undefined && customConnectionName.value.length > 0)
+    ) &&
     (serverUrl.value != undefined && serverUrl.value.length > 0) &&
     (
         (driverVersion.value != undefined && driverVersion.value.length > 0) ||
@@ -67,11 +81,12 @@ const changed = computed<boolean>(() =>
     ))
 
 const connectionNameRules = [
-    (value: any) => {
-        if (value) return true
+    (value: string | undefined) => {
+        if (value != undefined && value.trim().length > 0) return true
+        if (suggestedConnectionName.value.trim().length > 0) return true
         return t('connection.editor.form.connectionName.validations.required')
     },
-    async (value: any) => {
+    async (value: string) => {
         const similarConnection: ConnectionDto | undefined = await connectionManager.getSimilarConnection(value)
         if (similarConnection == undefined || similarConnection.id === connectionId.value) {
             return true
@@ -79,21 +94,12 @@ const connectionNameRules = [
         return t('connection.editor.form.connectionName.validations.duplicate')
     }
 ]
-const shortConnectionNameRules = [
-    (value: string | undefined) => {
-        if (value == undefined || value.trim() === '') return true
-        if (value.trim().length > 3) {
-            return t('connection.editor.form.shortConnectionName.validations.tooLong')
-        }
-        return true
-    }
-]
 const serverUrlRules = [
-    (value: any) => {
-        if (value) return true
+    (value: string) => {
+        if (value.trim().length > 0) return true
         return t('connection.editor.form.serverUrl.validations.required')
     },
-    (value: any) => {
+    (value: string) => {
         try {
             new URL(value)
             return true
@@ -101,7 +107,7 @@ const serverUrlRules = [
             return t('connection.editor.form.serverUrl.validations.invalidUrl')
         }
     },
-    async (value: any) => {
+    async (value: string) => {
         const resultError: string | undefined = await testConnection(value)
         if (resultError == undefined) {
             connectionTestResult.value = ConnectionTestResult.Success
@@ -114,37 +120,17 @@ const serverUrlRules = [
 
 async function testConnection(serverUrl: string): Promise<string | undefined> {
     connectionTesting.value = true
-    try {
-        const normalizedUrl: string = serverUrl.endsWith('/') ? serverUrl : serverUrl + '/'
-        const serverStatus: any = await ky.post(
-            `${normalizedUrl}io.evitadb.externalApi.grpc.generated.EvitaManagementService/ServerStatus`,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: '{}'
-            }
-        )
-            .json()
-
-        if (serverStatus.readiness !== 'API_READY') {
-            return t('connection.editor.form.serverUrl.validations.notReady')
-        }
-        if (serverStatus.api.lab?.enabled !== true) {
-            return t('connection.editor.form.serverUrl.validations.labApiMissing')
-        }
-        if (serverStatus.api.gRPC?.enabled !== true) {
-            return t('connection.editor.form.serverUrl.validations.grpcApiMissing')
-        }
-
-        connectionTesting.value = false
-        return undefined
-    } catch (e) {
-        connectionTesting.value = false
-        return t('connection.editor.form.serverUrl.validations.unreachable')
-    }
+    const result: string | undefined = await serverMetadataProvider.testConnection(serverUrl)
+    connectionTesting.value = false
+    return result
 }
+
+
+const debouncedResolveSuggestedConnectionName = debounce(
+    () => serverMetadataProvider.resolveServerName(serverUrl.value)
+        .then(name => suggestedConnectionName.value = name),
+    500
+)
 
 modalManager.onModalArgsPassed(async (url: string, args: any[]) => {
     if (url !== CONNECTION_EDITOR_URL) {
@@ -163,18 +149,28 @@ modalManager.onModalArgsPassed(async (url: string, args: any[]) => {
     }
 
     connectionId.value = existingConnectionId
-    connectionName.value = existingConnection.name
+    customConnectionName.value = existingConnection.name
     serverUrl.value = existingConnection.serverUrl
     driverVersion.value = existingConnection.driverVersion
-    customShortConnectionName.value = existingConnection.styling.shortName == undefined ? '' : existingConnection.styling.shortName
     color.value = existingConnection.styling.color == undefined ? '' : existingConnection.styling.color
 })
 
 async function save(): Promise<boolean> {
     try {
-        const finalShortConnectionName: string | undefined = customShortConnectionName.value == undefined || customShortConnectionName.value.length === 0
-            ? undefined
-            : customShortConnectionName.value
+        if (customConnectionName.value == undefined || customConnectionName.value.trim().length === 0) {
+            const similarConnection: ConnectionDto | undefined = await connectionManager.getSimilarConnection(suggestedConnectionName.value)
+            if (similarConnection != undefined && similarConnection.id !== connectionId.value) {
+                await toaster.error(t(
+                    'connection.editor.notification.similarNamedConnectionExists',
+                    { suggestedConnectionName: suggestedConnectionName.value }
+                ))
+                return false
+            }
+        }
+
+        const finalConnectionName: string | undefined = customConnectionName.value == undefined || customConnectionName.value.length === 0
+            ? suggestedConnectionName.value
+            : customConnectionName.value
         const finalColor: string | undefined = color.value == undefined || color.value.length === 0
             ? undefined
             : color.value
@@ -198,34 +194,32 @@ async function save(): Promise<boolean> {
         if (isNew.value) {
             connectionManager.storeConnection({
                 id: undefined,
-                name: connectionName.value,
+                name: finalConnectionName,
                 serverUrl: serverUrl.value,
                 driverVersion: finalDriverVersion,
                 styling: {
-                    shortName: finalShortConnectionName,
                     color: finalColor
                 }
             })
 
             await toaster.success(t(
                 'connection.editor.notification.connectionAdded',
-                { connectionName: connectionName.value }
+                { connectionName: finalConnectionName }
             ))
         } else {
             const existingConnection: ConnectionDto | undefined = await connectionManager.getConnection(connectionId.value)
             if (existingConnection == undefined) {
                 throw new Error(`Could not find existing connection for id ${connectionId.value}.`)
             }
-            existingConnection.name = connectionName.value
+            existingConnection.name = finalConnectionName
             existingConnection.serverUrl = serverUrl.value
             existingConnection.driverVersion = finalDriverVersion
-            existingConnection.styling.shortName = finalShortConnectionName
             existingConnection.styling.color = finalColor
             connectionManager.storeConnection(existingConnection)
 
             await toaster.success(t(
                 'connection.editor.notification.connectionUpdated',
-                { connectionName: connectionName.value }
+                { connectionName: finalConnectionName }
             ))
         }
 
@@ -240,15 +234,13 @@ async function save(): Promise<boolean> {
 }
 
 function reset(): void {
-    close()
-
     connectionId.value = undefined
-    connectionName.value = ''
+    suggestedConnectionName.value = ''
+    customConnectionName.value = ''
     serverUrl.value = ''
     connectionTestResult.value = ConnectionTestResult.NotTested
     driverVersion.value = ''
     latestAvailableDriverVersion.value = ''
-    customShortConnectionName.value = ''
     color.value = ''
 }
 
@@ -283,30 +275,7 @@ function handleVisibilityChange(visible: boolean): void {
             </template>
 
             <template #default>
-                <VTextField
-                    v-model="connectionName"
-                    :label="t('connection.editor.form.connectionName.label')"
-                    placeholder="evitaDB"
-                    :rules="connectionNameRules"
-                    required
-                />
-                <div class="styling-box">
-                    <VTextField
-                        v-model="customShortConnectionName"
-                        :label="t('connection.editor.form.shortConnectionName.label')"
-                        :hint="t('connection.editor.form.shortConnectionName.hint')"
-                        :placeholder="computedShortConnectionName"
-                        :persistent-placeholder="computedShortConnectionName.length > 0"
-                        :rules="shortConnectionNameRules"
-                    />
-                    <VColorSelect
-                        v-model="color"
-                        :label="t('connection.editor.form.color.label')"
-                        :hint="t('connection.editor.form.color.hint')"
-                    />
-                </div>
-
-                <VListSubheader>Server</VListSubheader>
+                <VListSubheader>{{ t('connection.editor.form.serverFieldset.label') }}</VListSubheader>
                 <VTextField
                     v-model="serverUrl"
                     :label="t('connection.editor.form.serverUrl.label')"
@@ -323,6 +292,21 @@ function handleVisibilityChange(visible: boolean): void {
                     @update:latest-available-driver-version="latestAvailableDriverVersion = $event"
                     :disabled="serverUrl == undefined || serverUrl.length === 0"
                     :server-url="serverUrl"
+                />
+
+                <VListSubheader>{{ t('connection.editor.form.connectionFieldset.label') }}</VListSubheader>
+                <VTextField
+                    v-model="customConnectionName"
+                    :label="t('connection.editor.form.connectionName.label')"
+                    :placeholder="suggestedConnectionName"
+                    :persistent-placeholder="suggestedConnectionName.length > 0"
+                    :rules="connectionNameRules"
+                    required
+                />
+                <VColorSelect
+                    v-model="color"
+                    :label="t('connection.editor.form.color.label')"
+                    :hint="t('connection.editor.form.color.hint')"
                 />
             </template>
 
@@ -342,10 +326,5 @@ function handleVisibilityChange(visible: boolean): void {
 </template>
 
 <style lang="scss" scoped>
-.styling-box {
-    width: 100%;
-    display: inline-grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-}
+
 </style>
