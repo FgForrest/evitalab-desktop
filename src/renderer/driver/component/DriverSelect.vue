@@ -8,6 +8,7 @@ import semver from 'semver/preload'
 import { FrontendDriverManagerIpc } from '../../../preload/renderer/ipc/driver/service/FrontendDriverManagerIpc'
 import { DriverDto } from '../../../common/ipc/driver/model/DriverDto'
 import { useI18n } from 'vue-i18n'
+import debounce from '../../util/debounce'
 
 const { t } = useI18n()
 
@@ -29,7 +30,7 @@ const emit = defineEmits<{
 
 watch(
     () => props.serverUrl,
-    async () => await resolveLatestAvailableDriver()
+    () => debouncedResolveLatestAvailableDriver()
 )
 
 const usedDriverVersion = defineModel<string>()
@@ -112,6 +113,10 @@ async function resolveLatestAvailableDriver(): Promise<void> {
 
     resolvingLatestAvailableDriver.value = false
 }
+const debouncedResolveLatestAvailableDriver = debounce(
+    () => resolveLatestAvailableDriver().then(),
+    500
+)
 
 function chooseNewerDriver(): void {
     if (isNewerDriverAvailable.value) {
