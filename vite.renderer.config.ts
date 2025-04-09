@@ -31,6 +31,7 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 skeleton: resolve(__dirname, 'src/renderer/skeleton/skeleton.html'),
+                notificationPanel: resolve(__dirname, 'src/renderer/notification/panel/notification-panel.html'),
                 navigationPanel: resolve(__dirname, 'src/renderer/navigation-panel/navigation-panel.html'),
                 connectionEditor: resolve(__dirname, 'src/renderer/connection/editor/connection-editor.html'),
                 connectionRemoveDialog: resolve(__dirname, 'src/renderer/connection/remove-dialog/connection-remove-dialog.html'),
