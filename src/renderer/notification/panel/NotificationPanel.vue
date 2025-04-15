@@ -10,7 +10,6 @@ ToastificationIntegrator.integrate(useToast())
 
 <template>
     <VApp style="background-color: transparent">
-<!--        todo lho print toast source -->
         <!-- placeholder for toastification plugin, that renders its components by itself -->
     </VApp>
 </template>
