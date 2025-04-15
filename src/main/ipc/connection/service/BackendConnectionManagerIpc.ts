@@ -28,17 +28,17 @@ import { ConnectionStylingDto } from '../../../../common/ipc/connection/model/Co
 export function initBackendConnectionManagerIpc(skeletonManager: SkeletonManager,
                                                 connectionManager: ConnectionManager,
                                                 modalManager: ModalManager): void {
-    ipcMain.on(
+    ipcMain.handle(
         connectionManagerIpc_activateConnection,
-        (event: IpcMainEvent, connectionId: ConnectionId | undefined) => {
-            connectionManager.activateConnection(connectionId)
+        async (event: IpcMainEvent, connectionId: ConnectionId | undefined) => {
+            await connectionManager.activateConnection(connectionId)
         }
     )
-    ipcMain.on(
+    ipcMain.handle(
         connectionManagerIpc_storeConnection,
-        (event: IpcMainEvent, connectionDto: ConnectionDto) => {
+        async (event: IpcMainEvent, connectionDto: ConnectionDto) => {
             if (connectionDto.id == undefined) {
-                connectionManager.storeConnection(new Connection(
+                await connectionManager.storeConnection(new Connection(
                     undefined,
                     connectionDto.name,
                     connectionDto.serverUrl,
@@ -60,20 +60,20 @@ export function initBackendConnectionManagerIpc(skeletonManager: SkeletonManager
                         connectionDto.styling.color
                     )
                 )
-                connectionManager.storeConnection(existingConnection)
+                await connectionManager.storeConnection(existingConnection)
             }
         }
     )
-    ipcMain.on(
+    ipcMain.handle(
         connectionManagerIpc_storeConnectionsOrder,
-        (event: IpcMainEvent, newOrder: ConnectionId[]) => {
-            connectionManager.storeConnectionsOrder(newOrder)
+        async (event: IpcMainEvent, newOrder: ConnectionId[]) => {
+            await connectionManager.storeConnectionsOrder(newOrder)
         }
     )
-    ipcMain.on(
+    ipcMain.handle(
         connectionManagerIpc_removeConnection,
-        (event: IpcMainEvent, connectionId: ConnectionId) => {
-            connectionManager.removeConnection(connectionId)
+        async (event: IpcMainEvent, connectionId: ConnectionId) => {
+            await connectionManager.removeConnection(connectionId)
         }
     )
     ipcMain.handle(

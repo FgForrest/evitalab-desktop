@@ -18,7 +18,6 @@ export interface FrontendNotificationManagerIpc {
  */
 export function exposeFrontendNotificationManagerIpc(): void {
     contextBridge.exposeInMainWorld('labNotificationManager', {
-        // todo lho fix vite cannot build two preloads with shared imported constants
         addNotification(definition: NotificationDefinitionDto): Promise<NotificationId> {
             return ipcRenderer.invoke('notificationManager:addNotification', definition)
         },

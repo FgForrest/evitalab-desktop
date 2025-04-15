@@ -4,6 +4,7 @@ import semver from 'semver/preload'
 import ky from 'ky'
 import { mkdir, access, writeFile, rm, rename } from 'node:fs/promises'
 import decompress from 'decompress'
+import log from 'electron-log/main'
 
 const updateDriverDatabaseAfterInMillis = 15 * 60 * 1000
 
@@ -45,8 +46,8 @@ export class DriverManager {
         }
         if (driverForServer == undefined) {
             // fallback to the oldest known driver
-            // todo lho somehow tell this info to the user
             driverForServer = this.driversForServerDatabase.last().availableDrivers.first()
+            log.warn(`No available driver for server version '${serverVersion}', using the oldest known driver '${driverForServer.version}'.`)
         }
 
         return driverForServer

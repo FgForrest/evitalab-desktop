@@ -32,18 +32,17 @@ export interface FrontendConnectionManagerIpc {
  */
 export function exposeFrontendConnectionManagerIpc(): void {
     contextBridge.exposeInMainWorld('labConnectionManager', {
-        // todo lho use invoke everywhere so i can await the response (that it is processed?)
-        activateConnection(connectionId: ConnectionId | undefined): void {
-            ipcRenderer.send(connectionManagerIpc_activateConnection, connectionId)
+        async activateConnection(connectionId: ConnectionId | undefined): Promise<void> {
+            await ipcRenderer.invoke(connectionManagerIpc_activateConnection, connectionId)
         },
-        storeConnection(connection: ConnectionDto): void {
-            ipcRenderer.send(connectionManagerIpc_storeConnection, connection)
+        async storeConnection(connection: ConnectionDto): Promise<void> {
+            await ipcRenderer.invoke(connectionManagerIpc_storeConnection, connection)
         },
-        storeConnectionsOrder(newOrder: ConnectionId[]): void {
-            ipcRenderer.send(connectionManagerIpc_storeConnectionsOrder, newOrder)
+        async storeConnectionsOrder(newOrder: ConnectionId[]): Promise<void> {
+            await ipcRenderer.invoke(connectionManagerIpc_storeConnectionsOrder, newOrder)
         },
-        removeConnection(connectionId: ConnectionId): void {
-            ipcRenderer.send(connectionManagerIpc_removeConnection, connectionId)
+        async removeConnection(connectionId: ConnectionId): Promise<void> {
+            await ipcRenderer.invoke(connectionManagerIpc_removeConnection, connectionId)
         },
         getConnections(): Promise<ConnectionDto[]> {
             return ipcRenderer.invoke(connectionManagerIpc_getConnections)
