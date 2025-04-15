@@ -1,0 +1,34 @@
+# Verifies dev branch integrity by building the project
+
+name: Dev
+
+on:
+  push:
+    branches:
+      - dev
+
+concurrency:
+  group: ${{ github.head_ref || github.ref_name }}  # for the same branch (dev or PR)
+  cancel-in-progress: true        # run only one workflow at a time (cancel the previous)
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  verify:
+    name: Verify (build and test)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node-action
+
+      - name: Test
+        run: yarn test
