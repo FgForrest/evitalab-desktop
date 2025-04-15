@@ -12,7 +12,9 @@ import {
 } from '../../../preload/renderer/ipc/connection/service/FrontendConnectionManagerIpc'
 import { FrontendModalManagerIpc } from '../../../preload/renderer/ipc/modal/service/FrontendModalManagerIpc'
 import { ConnectionDto } from '../../../common/ipc/connection/model/ConnectionDto'
+import { FrontendAppUpdateManagerIpc } from '../../../preload/renderer/ipc/update/service/FrontendAppUpdateManagerIpc'
 
+const appUpdateManager: FrontendAppUpdateManagerIpc = window.labAppUpdateManager
 const connectionManager: FrontendConnectionManagerIpc = window.labConnectionManager
 const modalManager: FrontendModalManagerIpc = window.labModalManager
 
@@ -44,6 +46,10 @@ connectionManager.onConnectionsChange((newConnections: ConnectionDto[]) =>
 function openNavigationPanel(): void {
     modalManager.openModal(NAVIGATION_PANEL_URL)
 }
+
+const appUpdateAvailable = ref<boolean>(false)
+appUpdateManager.isUpdateAvailable()
+    .then(it => appUpdateAvailable.value = it)
 </script>
 
 <template>
@@ -82,6 +88,11 @@ function openNavigationPanel(): void {
         <template #append>
             <!-- just a visual aid to help new users find hidden navigation panel -->
             <VList>
+                <VListItem
+                    v-if="appUpdateAvailable"
+                    prepend-icon="mdi-alert-decagram-outline"
+                    color="warning"
+                ></VListItem>
                 <VListItem prepend-icon="mdi-arrow-expand-right"></VListItem>
             </VList>
         </template>

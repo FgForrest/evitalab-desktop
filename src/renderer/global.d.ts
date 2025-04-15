@@ -11,11 +11,13 @@ import {
 import {
     FrontendServicingNotificationManagerIpc
 } from '../preload/renderer/ipc/notification/service/FrontendServicingNotificationManagerIpc'
+import { FrontendAppUpdateManagerIpc } from '../preload/renderer/ipc/update/service/FrontendAppUpdateManagerIpc'
 
 export {}
 
 declare global {
     interface Window {
+        labAppUpdateManager: FrontendAppUpdateManagerIpc,
         labConnectionManager: FrontendConnectionManagerIpc,
         labModalManager: FrontendModalManagerIpc,
         labDriverManager: FrontendDriverManagerIpc,

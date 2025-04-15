@@ -1,0 +1,228 @@
+# Builds and releases a new public version of evitaLab a puts it into `Releases` section of GitHub
+
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+
+concurrency:
+  group: ${{ github.ref_name }}   # for the same branch
+  cancel-in-progress: true        # run only one workflow at a time (cancel the previous)
+
+permissions:
+  contents: read
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  prepare:
+    name: Prepare
+    outputs:
+      released_version: ${{ steps.release_version.outputs.version }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node-action
+
+      - name: Test
+        run: yarn test
+
+      - name: Resolve new release version
+        id: release_version
+        uses: lukashornych/semantic-calendar-version@v1.1.3
+        with:
+          prefix: 'v'
+          minor-identifier: '/feat(?:\\([^)]+\\))?:/'
+
+  build-macos:
+    name: Build macOS Intel/Arm
+    needs: prepare
+
+    strategy:
+      matrix:
+        os: [macos-latest, macos-13]
+        include:
+          - os: macos-latest
+            arch: 'arm64'
+          - os: macos-13
+            arch: 'x64'
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - id: Build
+        uses: ./.github/actions/build-evitalab-desktop-action
+        with:
+          released-version: ${{ needs.prepare.outputs.released_version }}
+
+      - name: Upload .dmg packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'macos-packages-${{ matrix.arch }}-dmg'
+          path: out/make/*.dmg
+
+      - name: Upload .zip packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'macos-packages-${{ matrix.arch }}-zip'
+          path: out/make/zip/darwin/${{ matrix.arch }}/*.zip
+
+  build-windows:
+    name: Build Windows
+    needs: prepare
+
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - id: Build
+        uses: ./.github/actions/build-evitalab-desktop-action
+        with:
+          released-version: ${{ needs.prepare.outputs.released_version }}
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'windows-packages'
+          path: out/make/squirrel.windows/x64/*.exe
+
+  build-linux:
+    name: Build Linux
+    needs: prepare
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - id: Build
+        uses: ./.github/actions/build-evitalab-desktop-action
+        with:
+          released-version: ${{ needs.prepare.outputs.released_version }}
+
+      - name: Upload .deb packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'linux-packages-deb'
+          path: out/make/deb/x64/*.deb
+
+      - name: Upload .rpm packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'linux-packages-rpm'
+          path: out/make/rpm/x64/*.rpm
+
+      - name: Upload .AppImage packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'linux-packages-appimage'
+          path: out/make/AppImage/x64/*.AppImage
+
+  release:
+    name: Release
+    needs:
+      - prepare
+      - build-macos
+      - build-windows
+      - build-linux
+
+    permissions:
+      # write permission is required to create a github release
+      contents: write
+
+      # write permission is required for autolabeler
+      # otherwise, read permission is required at least
+      pull-requests: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download macOS x64 .dmg packages
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-packages-x64-dmg
+          path: ./packages/
+
+      - name: Download macOS x64 .zip packages
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-packages-x64-zip
+          path: ./packages/
+
+      - name: Download macOS Arm .dmg packages
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-packages-arm64-dmg
+          path: ./packages/
+
+      - name: Download macOS Arm .zip packages
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-packages-arm64-zip
+          path: ./packages/
+
+      - name: Download Windows packages
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-packages
+          path: ./packages/
+
+      - name: Download Linux .deb packages
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-packages-deb
+          path: ./packages/
+
+      - name: Download Linux .rpm packages
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-packages-rpm
+          path: ./packages/
+
+      - name: Download Linux .AppImage packages
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-packages-appimage
+          path: ./packages/
+
+      - name: Create release
+        id: create_release
+        uses: release-drafter/release-drafter@v5
+        with:
+          version: ${{ needs.prepare.outputs.released_version }}
+          publish: true
+
+      - name: Upload packages
+        uses: AButler/upload-release-assets@v3.0
+        with:
+          files: "packages/*"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          release-id: ${{ steps.create_release.outputs.id }}

@@ -8,7 +8,6 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "publish": "electron-forge publish",
     "lint": "eslint --ext .ts,.tsx .",
     "test": "vitest"
   },
@@ -24,6 +23,7 @@
     "@electron-forge/plugin-vite": "^7.6.0",
     "@electron/fuses": "^1.8.0",
     "@fetch-mock/vitest": "^0.2.13",
+    "@reforged/maker-appimage": "^5.0.0",
     "@types/decompress": "^4.2.7",
     "@types/electron-squirrel-startup": "^1.0.2",
     "@types/xxhashjs": "^0.2.4",
@@ -58,6 +58,7 @@
     "markdown-it": "^14.1.0",
     "markdown-it-emoji": "^3.0.0",
     "semver": "^7.7.1",
+    "update-electron-app": "^3.1.1",
     "uuid": "^11.1.0",
     "vitest": "^3.0.9",
     "vue": "^3.5.13",

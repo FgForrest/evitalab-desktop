@@ -11,12 +11,11 @@ const welcomeScreenManager: WelcomeScreenService = new WelcomeScreenService()
 const { t } = useI18n()
 
 const version = computed(() => {
-    // todo lho impl
-    // const actualVersion: string = import.meta.env.VITE_BUILD_VERSION
-    // if (actualVersion == undefined || actualVersion.length === 0) {
+    const actualVersion: string = import.meta.env.VITE_BUILD_VERSION
+    if (actualVersion == undefined || actualVersion.length === 0) {
         return '?'
-    // }
-    // return actualVersion.substring(1) // remove v prefix
+    }
+    return actualVersion.substring(1) // remove the 'v' prefix
 })
 const blogPosts = ref<List<EvitaDBBlogPost>>(List())
 

@@ -20,6 +20,8 @@ import { initBackendDriverManagerIpc } from './ipc/driver/service/BackendDriverM
 import menu from './menu'
 import { NotificationManager } from './notification/service/NotificationManager'
 import { initBackendNotificationManagerIpc } from './ipc/notification/service/BackendNotificationManagerIpc'
+import { AppUpdateManager } from './update/service/AppUpdateManager'
+import { initBackendAppUpdateManagerIpc } from './ipc/update/service/BackendAppUpdateManagerIpc'
 
 /**
  * Entrypoint of evitaLab app. Initializes the entire app.
@@ -36,6 +38,7 @@ export async function initialize(): Promise<void> {
     }
 
     // initialize managers
+    const appUpdateManager: AppUpdateManager = new AppUpdateManager()
     const appConfig: AppConfig = new AppConfig()
     const skeletonManager: SkeletonManager = new SkeletonManager()
     const notificationManager: NotificationManager = new NotificationManager()
@@ -64,7 +67,11 @@ export async function initialize(): Promise<void> {
     await app.whenReady()
     log.log('Electron app ready.')
 
+    // update app if possible
+    appUpdateManager.tryAutoUpdate()
+
     // initialize structure
+    initBackendAppUpdateManagerIpc(appUpdateManager)
     initBackendNotificationManagerIpc(notificationManager)
     initBackendConnectionManagerIpc(skeletonManager, connectionManager, modalManager)
     initBackendModalManagerIpc(modalManager)

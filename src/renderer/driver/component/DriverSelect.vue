@@ -98,7 +98,6 @@ async function resolveLatestAvailableDriver(): Promise<void> {
             try {
                 latestAvailableDriver.value = await driverManager.resolveLatestAvailableDriver(props.serverUrl)
             } catch (e) {
-                // todo lho toaster after debounce function is applied
                 errorDuringAvailableDriverResolution.value = true
                 console.error(e)
                 // server probably not reachable

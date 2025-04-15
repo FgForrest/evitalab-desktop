@@ -6,44 +6,77 @@ import { MakerRpm } from '@electron-forge/maker-rpm'
 import { VitePlugin } from '@electron-forge/plugin-vite'
 import { FusesPlugin } from '@electron-forge/plugin-fuses'
 import { FuseV1Options, FuseVersion } from '@electron/fuses'
+import { MakerAppImage } from '@reforged/maker-appimage'
 import { MakerDMG } from '@electron-forge/maker-dmg'
 
 const config: ForgeConfig = {
     packagerConfig: {
-        asar: true,
         name: 'evitalab', // seems to be only for building, not displaying to user
+        asar: true,
         appCategoryType: 'public.app-category.developer-tools',
-        icon: 'public/icon/icon'
+        icon: 'assets/icon/icon',
+        win32metadata: {
+            CompanyName: 'FgForrest a.s.',
+            OriginalFilename: 'evitaLab',
+        },
     },
     rebuildConfig: {},
     makers: [
-        new MakerSquirrel({}),
-        new MakerZIP({}, ['darwin']),
-        new MakerDMG({
-            name: 'evitaLab',
-            icon: 'public/icon/icon.icns',
-            background: 'public/installer/background.png'
-        }),
-        new MakerRpm({
-            options: {
-                name: 'evitaLab',
-                icon: 'public/icon/icon.png',
-                description: 'evitaDB Desktop Client',
-                categories: ['Development'],
-                homepage: 'https://github.com/FgForrest/evitalab-desktop'
-            }
-        }),
-        new MakerDeb({
-            options: {
-                name: 'evitaLab',
-                icon: 'public/icon/icon.png',
-                description: 'evitaDB Desktop Client',
-                maintainer: 'Lukáš Hornych',
-                homepage: 'https://github.com/FgForrest/evitalab-desktop',
-                categories: ['Development'],
-                section: 'database'
-            }
-        })
+        new MakerSquirrel(
+            (arch: string) => ({
+                name: 'evitalab',
+                authors: 'FgForrest a.s.',
+                exe: 'evitalab.exe',
+                iconUrl:
+                    'https://raw.githubusercontent.com/FgForrest/evitalab-desktop/dev/assets/icon/icon.ico',
+                noMsi: true,
+                setupIcon: 'assets/icon/icon.ico'
+            }),
+            ['win32']
+        ),
+        new MakerZIP(
+            {},
+            ['darwin']
+        ),
+        new MakerDMG(
+            {
+                icon: 'assets/icon/icon.icns',
+                background: 'assets/installer/background.png'
+            },
+            ['darwin']
+        ),
+        new MakerRpm(
+            {
+                options: {
+                    icon: 'assets/icon/icon.png',
+                    description: 'evitaDB Desktop Client',
+                    categories: ['Development'],
+                    homepage: 'https://github.com/FgForrest/evitalab-desktop'
+                }
+            },
+            ['linux']
+        ),
+        new MakerDeb(
+            {
+                options: {
+                    icon: 'assets/icon/icon.png',
+                    description: 'evitaDB Desktop Client',
+                    maintainer: 'FgForrest a.s.',
+                    homepage: 'https://github.com/FgForrest/evitalab-desktop',
+                    categories: ['Development'],
+                    section: 'database'
+                }
+            },
+            ['linux']
+        ),
+        new MakerAppImage(
+            {
+                options: {
+                    categories: ['Development']
+                }
+            },
+            ['linux']
+        )
     ],
     plugins: [
         new VitePlugin({

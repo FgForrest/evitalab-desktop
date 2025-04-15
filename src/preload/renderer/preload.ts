@@ -3,7 +3,9 @@ import { exposeFrontendNotificationManagerIpc } from './ipc/notification/service
 import { exposeFrontendServicingNotificationManagerIpc } from './ipc/notification/service/FrontendServicingNotificationManagerIpc'
 import { exposeFrontendModalManagerIpc } from './ipc/modal/service/FrontendModalManagerIpc'
 import { exposeFrontendDriverManagerIpc } from './ipc/driver/service/FrontendDriverManagerIpc'
+import { exposeFrontendAppUpdateManagerIpc } from './ipc/update/service/FrontendAppUpdateManagerIpc'
 
+exposeFrontendAppUpdateManagerIpc()
 exposeFrontendConnectionManagerIpc()
 exposeFrontendNotificationManagerIpc()
 exposeFrontendServicingNotificationManagerIpc()

@@ -1,6 +1,9 @@
 {
   "app": {
-    "name": "evitaLab"
+    "name": "evitaLab",
+    "update": {
+      "availableInfo": "There is a newer version of evitaLab Desktop available."
+    }
   },
   "common": {
     "placeholder": {

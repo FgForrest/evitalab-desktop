@@ -2,8 +2,24 @@
  * Navigation panel footer with useful info.
  */
 import { useI18n } from 'vue-i18n'
+import { computed, ref } from 'vue'
+import { FrontendAppUpdateManagerIpc } from '../../../preload/renderer/ipc/update/service/FrontendAppUpdateManagerIpc'
 
+const appUpdateManager: FrontendAppUpdateManagerIpc = window.labAppUpdateManager
 const { t } = useI18n()
+
+const version = computed(() => {
+    const actualVersion: string = import.meta.env.VITE_BUILD_VERSION
+    if (actualVersion == undefined || actualVersion.length === 0) {
+        return '?'
+    }
+    return actualVersion
+})
+
+const appUpdateAvailable = ref<boolean>(false)
+appUpdateManager.isUpdateAvailable()
+    .then(it => appUpdateAvailable.value = it)
+
 </script>
 
 <template>
@@ -29,10 +45,29 @@ const { t } = useI18n()
             </li>
         </ul>
 
-        <span class="app-version text-subtitle-2 text-disabled">
-<!--                    todo lho version -->
-            v2025.1.0
-        </span>
+        <div class="version-container">
+            <span class="app-version text-subtitle-2 text-disabled">
+                {{ version }}
+            </span>
+            <VTooltip>
+                <template #activator="{ props }">
+                    <VBtn
+                        v-if="appUpdateAvailable"
+                        icon
+                        variant="flat"
+                        density="compact"
+                        v-bind="props"
+                        @click="appUpdateManager.manualUpdateApp()"
+                        class="app-update-button"
+                    >
+                        <VIcon color="warning">mdi-alert-decagram-outline</VIcon>
+                    </VBtn>
+                </template>
+                <template #default>
+                    {{ t('app.update.availableInfo') }}
+                </template>
+            </VTooltip>
+        </div>
     </footer>
 </template>
 
@@ -44,6 +79,11 @@ const { t } = useI18n()
     width: 100%;
     gap: 1rem;
     height: 3rem;
+}
+
+.version-container {
+    display: flex;
+    align-items: center;
 }
 
 .lab-nav-links {
@@ -74,5 +114,9 @@ const { t } = useI18n()
     text-align: right;
     line-height: 3rem;
     margin-right: 0.5rem;
+}
+
+.app-update-button {
+    margin-right: 0.25rem;
 }
 </style>
