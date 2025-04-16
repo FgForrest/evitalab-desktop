@@ -80,7 +80,7 @@ function storeConnectionsOrder(): void {
                 {{ t('navigation.panel.connection.title') }}
             </span>
 
-            <VTooltip>
+            <VTooltip v-if="connections.length > 0">
                 <template #activator="{ props }">
                     <VBtn
                         v-bind="props"
@@ -99,7 +99,14 @@ function storeConnectionsOrder(): void {
             </VTooltip>
         </div>
 
+<!--        todo lho big add button if there is not connection-->
+        <VBtn v-if="connections.length === 0">
+            <VIcon>mdi-plus</VIcon>
+            {{ t('navigation.panel.button.addConnection') }}
+        </VBtn>
+
         <draggable
+            v-else
             v-model="connections"
             group="connections"
             item-key="id"

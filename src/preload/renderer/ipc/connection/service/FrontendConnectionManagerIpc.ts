@@ -15,10 +15,10 @@ import {
  * Interface of connection manager IPC for frontend renderer.
  */
 export interface FrontendConnectionManagerIpc {
-    activateConnection(connectionId: ConnectionId | undefined): void,
-    storeConnection(connection: ConnectionDto): void,
-    storeConnectionsOrder(newOrder: ConnectionId[]): void,
-    removeConnection(connectionId: ConnectionId): void,
+    activateConnection(connectionId: ConnectionId | undefined): Promise<void>,
+    storeConnection(connection: ConnectionDto): Promise<void>,
+    storeConnectionsOrder(newOrder: ConnectionId[]): Promise<void>,
+    removeConnection(connectionId: ConnectionId): Promise<void>,
     getConnections(): Promise<ConnectionDto[]>,
     getConnection(connectionId: ConnectionId): Promise<ConnectionDto | undefined>,
     getSimilarConnection(connectionName: string): Promise<ConnectionDto | undefined>,

@@ -13,10 +13,16 @@ import {
 import { FrontendModalManagerIpc } from '../../../preload/renderer/ipc/modal/service/FrontendModalManagerIpc'
 import { ConnectionDto } from '../../../common/ipc/connection/model/ConnectionDto'
 import { FrontendAppUpdateManagerIpc } from '../../../preload/renderer/ipc/update/service/FrontendAppUpdateManagerIpc'
+import { useI18n } from 'vue-i18n'
+import { Toaster, useToaster } from '../../notification/service/Toaster'
 
 const appUpdateManager: FrontendAppUpdateManagerIpc = window.labAppUpdateManager
 const connectionManager: FrontendConnectionManagerIpc = window.labConnectionManager
 const modalManager: FrontendModalManagerIpc = window.labModalManager
+const toaster: Toaster = useToaster()
+const { t } = useI18n()
+
+const userHovering = ref<boolean>(false)
 
 const activatedConnections = ref<ConnectionId[]>([])
 connectionManager.getActiveConnection()
@@ -43,6 +49,21 @@ connectionManager.onConnectionActivation((activated: ConnectionDto | undefined) 
 connectionManager.onConnectionsChange((newConnections: ConnectionDto[]) =>
     connections.value = newConnections)
 
+function selectConnection(item: any): void {
+    try {
+        if (!item.value) {
+            connectionManager.activateConnection(undefined)
+        } else {
+            connectionManager.activateConnection(item.id)
+        }
+    } catch (e) {
+        toaster.error(t(
+            'navigation.panel.connection.notification.couldNotActivateConnection',
+            { reason: e.message }
+        ), e)
+    }
+}
+
 function openNavigationPanel(): void {
     modalManager.openModal(NAVIGATION_PANEL_URL)
 }
@@ -57,11 +78,15 @@ appUpdateManager.isUpdateAvailable()
         permanent
         rail
         class="bg-primary-dark"
-        @mouseenter="openNavigationPanel"
+        @mouseenter="userHovering = true"
+        @mouseleave="userHovering = false"
     >
         <template #prepend>
             <div class="app-avatar-container">
-                <VAvatar size="30px">
+                <VBtn v-if="userHovering" icon variant="text" @click="openNavigationPanel">
+                    <VIcon>mdi-menu</VIcon>
+                </VBtn>
+                <VAvatar v-else size="30px">
                     <VImg
                         alt="evitaLab Logo"
                         width="30px"
@@ -78,6 +103,7 @@ appUpdateManager.isUpdateAvailable()
                 density="compact"
                 nav
                 class="connection-items"
+                @click:select="selectConnection"
             >
                 <VListItem v-for="connection in connections" :key="connection.id" :value="connection.id">
                     <ConnectionAvatar :connection="connection" />
@@ -88,12 +114,27 @@ appUpdateManager.isUpdateAvailable()
         <template #append>
             <!-- just a visual aid to help new users find hidden navigation panel -->
             <VList>
+                <VListItem>
+                    <a href="https://evitadb.io/documentation" target="_blank">
+                        <img src="/documentation.svg" :alt="t('navigation.panel.link.evitaDBDocumentation.icon.alt')">
+                        <VTooltip activator="parent">
+                            {{ t('navigation.panel.link.evitaDBDocumentation.tooltip') }}
+                        </VTooltip>
+                    </a>
+                </VListItem>
+                <VListItem>
+                    <a href="https://discord.gg/VsNBWxgmSw" target="_blank">
+                        <img src="/discord.svg" :alt="t('navigation.panel.link.discord.icon.alt')">
+                        <VTooltip activator="parent">
+                            {{ t('navigation.panel.link.discord.tooltip') }}
+                        </VTooltip>
+                    </a>
+                </VListItem>
                 <VListItem
                     v-if="appUpdateAvailable"
                     prepend-icon="mdi-alert-decagram-outline"
                     color="warning"
                 ></VListItem>
-                <VListItem prepend-icon="mdi-arrow-expand-right"></VListItem>
             </VList>
         </template>
     </VNavigationDrawer>

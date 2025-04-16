@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { NAVIGATION_PANEL_URL } from './navigationPanelConstants'
 import { FrontendModalManagerIpc } from '../../preload/renderer/ipc/modal/service/FrontendModalManagerIpc'
-import ConnectionList from './component/ConnectionList.vue'
 import ModalWindow from '../common/component/ModalWindow.vue'
-import Header from './component/Header.vue'
-import Footer from './component/Footer.vue'
+import Panel from './component/Panel.vue'
 
 const modalManager: FrontendModalManagerIpc = window.labModalManager
 
@@ -15,24 +13,14 @@ function closeNavigationPanel(): void {
 </script>
 
 <template>
-    <ModalWindow>
-        <VNavigationDrawer permanent :width="350">
-            <template #prepend>
-                <Header />
-            </template>
+<!--    todo lho keydown not working-->
+    <ModalWindow @keydown.esc="closeNavigationPanel">
+        <Panel />
 
-            <template #default>
-                <ConnectionList />
-            </template>
-
-            <template #append>
-                <Footer />
-            </template>
-        </VNavigationDrawer>
-
+        <!-- color from modal background -->
         <VMain
             style="background-color: rgba(35, 53, 92, 0.80)"
-            @mouseenter="closeNavigationPanel"
+            @click="closeNavigationPanel"
         />
     </ModalWindow>
 </template>

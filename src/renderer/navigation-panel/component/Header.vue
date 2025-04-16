@@ -5,14 +5,26 @@
 
 import ManageMenu from './ManageMenu.vue'
 import { useI18n } from 'vue-i18n'
+import {
+    FrontendConnectionManagerIpc
+} from '../../../preload/renderer/ipc/connection/service/FrontendConnectionManagerIpc'
+import { NAVIGATION_PANEL_URL } from '../navigationPanelConstants'
+import { FrontendModalManagerIpc } from '../../../preload/renderer/ipc/modal/service/FrontendModalManagerIpc'
 
+const connectionManager: FrontendConnectionManagerIpc = window.labConnectionManager
+const modalManager: FrontendModalManagerIpc = window.labModalManager
 const { t } = useI18n()
+
+async function goHome(): Promise<void> {
+    await connectionManager.activateConnection(undefined)
+    modalManager.closeModal(NAVIGATION_PANEL_URL)
+}
 </script>
 
 <template>
     <VListItem class="navigation-panel-header">
         <template #prepend>
-            <VAvatar size="30px">
+            <VAvatar size="30px" @click="goHome" style="cursor: pointer">
                 <VImg
                     alt="evitaLab Logo"
                     width="30px"

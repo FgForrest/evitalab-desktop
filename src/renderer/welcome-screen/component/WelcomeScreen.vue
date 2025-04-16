@@ -22,6 +22,8 @@ const blogPosts = ref<List<EvitaDBBlogPost>>(List())
 welcomeScreenManager.getBlogPosts().then((posts) => {
     blogPosts.value = posts
 })
+
+// todo lho hide content if connection is active
 </script>
 
 <template>

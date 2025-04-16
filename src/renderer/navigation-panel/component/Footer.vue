@@ -28,18 +28,18 @@ appUpdateManager.isUpdateAvailable()
     <footer class="navigation-panel-footer">
         <ul class="lab-nav-links">
             <li>
-                <a href="https://evitadb.io/documentation" target="_blank">
-                    <img src="/documentation.svg" :alt="t('navigation.panel.link.evitaDBDocumentation.icon.alt')">
-                    <VTooltip activator="parent">
-                        {{ t('navigation.panel.link.evitaDBDocumentation.tooltip') }}
-                    </VTooltip>
-                </a>
-            </li>
-            <li>
                 <a href="https://discord.gg/VsNBWxgmSw" target="_blank">
                     <img src="/discord.svg" :alt="t('navigation.panel.link.discord.icon.alt')">
                     <VTooltip activator="parent">
                         {{ t('navigation.panel.link.discord.tooltip') }}
+                    </VTooltip>
+                </a>
+            </li>
+            <li>
+                <a href="https://evitadb.io/documentation" target="_blank">
+                    <img src="/documentation.svg" :alt="t('navigation.panel.link.evitaDBDocumentation.icon.alt')">
+                    <VTooltip activator="parent">
+                        {{ t('navigation.panel.link.evitaDBDocumentation.tooltip') }}
                     </VTooltip>
                 </a>
             </li>
