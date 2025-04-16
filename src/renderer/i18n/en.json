@@ -1,0 +1,197 @@
+{
+  "app": {
+    "name": "evitaLab",
+    "update": {
+      "availableInfo": "There is a newer version of evitaLab Desktop available."
+    }
+  },
+  "common": {
+    "placeholder": {
+      "empty": "<empty>",
+      "emptyArray": "<empty array>",
+      "null": "<null>",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "button": {
+      "close": "Close",
+      "cancel": "Cancel",
+      "remove": "Remove",
+      "confirm": "Confirm",
+      "add": "Add",
+      "save": "Save"
+    },
+    "dialog": {
+      "confirmDialog": {
+        "title": "Dangerous operation",
+        "message": "Warning! You are about to do dangerous operation. Are you sure you want to proceed?"
+      }
+    }
+  },
+  "welcomeScreen": {
+    "changelog": "changelog",
+    "description": "evitaDB desktop client",
+    "blog": {
+      "thumbnail": {
+        "alt": "Image - {title}"
+      },
+      "button": {
+        "read": "Read"
+      }
+    },
+    "link": {
+      "evitaDBDocumentation": {
+        "text": "Check out the {link}",
+        "link": "evitaDB documentation"
+      },
+      "evitaLabGitHub": {
+        "text": "Give us a ⭐ on {link}",
+        "link": "GitHub"
+      },
+      "discord": {
+        "text": "Reach out to us on {link}",
+        "link": "Discord"
+      },
+      "submitIssue": "Submit an issue"
+    }
+  },
+  "navigation": {
+    "panel": {
+      "button": {
+        "addConnection": "Add connection"
+      },
+      "manage": {
+        "evitaLabHelp": {
+          "title": "evitaLab Help",
+          "item": {
+            "evitaLabGithub": "evitaLab GitHub",
+            "discussEvitaLab": "Discuss evitaLab",
+            "reportEvitaLabIssue": "Report evitaLab issue"
+          }
+        },
+        "evitaDBHelp": {
+          "title": "evitaDB Help",
+          "item": {
+            "evitaDBDocumentation": "evitaDB Documentation",
+            "evitaDBGithub": "evitaDB GitHub",
+            "discussEvitaDB": "Discuss evitaDB",
+            "reportEvitaDBIssue": "Report evitaDB issue"
+          }
+        }
+      },
+      "link": {
+        "evitaDBDocumentation": {
+          "icon": {
+            "alt": "evitaDB Documentation"
+          },
+          "tooltip": "Open evitaDB documentation"
+        },
+        "discord": {
+          "icon": {
+            "alt": "Discord"
+          },
+          "tooltip": "Discuss on Discord"
+        }
+      },
+      "connection": {
+        "title": "Connections",
+        "item": {
+          "action": {
+            "edit": "Edit connection",
+            "remove": "Remove connection"
+          },
+          "button": {
+            "driverUpdateAvailable": "New driver"
+          }
+        },
+        "notification": {
+          "couldNotActivateConnection": "Could not activate connection: {reason}"
+        }
+      }
+    }
+  },
+  "connection": {
+    "editor": {
+      "title": {
+        "add": "Add connection",
+        "edit": "Edit connection"
+      },
+      "form": {
+        "serverFieldset": {
+          "label": "Server"
+        },
+        "connectionFieldset": {
+          "label": "Connection"
+        },
+        "connectionName": {
+          "label": "Connection name",
+          "validations": {
+            "required": "Name of connection is required.",
+            "duplicate": "Different connection with similar name already exists."
+          }
+        },
+        "serverUrl": {
+          "label": "Server URL",
+          "hint": "Base scheme://hostname:port of evitaLab API configured on the server you want to connect to.",
+          "validations": {
+            "required": "Server URL is required.",
+            "invalidUrl": "Server URL is not a valid URL.",
+            "notReady": "Server is not ready yet.",
+            "labApiMissing": "evitaLab API is not enabled on the server.",
+            "notLabUrl": "Server URL is not URL of evitaLab API.",
+            "grpcApiMissing": "gRPC API is not enabled on the server.",
+            "unreachable": "Server is not reachable."
+          }
+        },
+        "color": {
+          "label": "Color",
+          "hint": "Helps distinguish connections among each other"
+        },
+        "environment": {
+          "label": "Environment",
+          "hint": "Helps distinguish connections of single project among different environments.",
+          "type": {
+            "development": "Development",
+            "test": "Test",
+            "production": "Production"
+          }
+        }
+      },
+      "button": {
+        "downloadingDriver": "Downloading driver..."
+      },
+      "notification": {
+        "similarNamedConnectionExists": "Another connection with suggested name {suggestedConnectionName} already exists. Please define custom connection name.",
+        "connectionAdded": "The {connectionName} connection has been successfully added.",
+        "connectionUpdated": "The {connectionName} connection has been successfully updated.",
+        "couldNotSaveConnection": "Could not save the connection: {reason}",
+        "couldNotDownloadDriver": "Could not download selected driver: {reason}"
+      },
+      "driverSelect": {
+        "usedDriver": {
+          "label": "Used driver",
+          "hint": {
+            "tooOld": "Current server requires newer version of the driver. Older driver may not work properly with the newer server version."
+          }
+        },
+        "latestAvailableDriver": {
+          "label": "Latest available driver",
+          "placeholder": {
+            "noDriver": "No driver available"
+          },
+          "hint": {
+            "couldNotResolve": "Could not resolve latest available driver for defined server URL. Could not resolve server version."
+          }
+        }
+      }
+    },
+    "removeDialog": {
+      "title": "Remove {connectionName} connection",
+      "question": "Do you want to remove the connection?",
+      "notification": {
+        "connectionRemoved": "The {connectionName} connection has been successfully removed.",
+        "couldNotRemoveConnection": "Could not remove the {connectionName} connection: {reason}"
+      }
+    }
+  }
+}

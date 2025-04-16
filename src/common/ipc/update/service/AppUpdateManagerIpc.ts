@@ -1,0 +1,2 @@
+export const appUpdateManagerIpc_isUpdateAvailable = 'appUpdateManagerIpc:isUpdateAvailable'
+export const appUpdateManagerIpc_manualUpdateApp = 'appUpdateManagerIpc:manualUpdateApp'

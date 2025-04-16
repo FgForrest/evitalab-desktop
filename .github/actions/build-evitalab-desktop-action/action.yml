@@ -1,0 +1,25 @@
+name: 'Build evitaLab desktop using Electron Forge make'
+inputs:
+  released-version:
+    description: 'Resolved released version'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node.js
+      uses: ./.github/actions/setup-node-action
+
+    - name: Set resolved release version
+      shell: bash
+      run: |
+        NORMALIZED_VERSION=$(echo "${{ inputs.released-version }}" | cut -c2-)
+        jq --arg v "$NORMALIZED_VERSION" '.version = $v' "package.json" > "new_package.json"
+        rm package.json
+        mv new_package.json package.json
+
+    - name: Build
+      shell: bash
+      env:
+        EVITALAB_DESKTOP_BUILD_VERSION: ${{ inputs.released-version }}
+      run: yarn make
+

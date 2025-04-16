@@ -1,6 +1,6 @@
 {
-  "name": "evitalab-desktop",
-  "productName": "evitaLab Desktop",
+  "name": "evitalab",
+  "productName": "evitaLab",
   "version": "1.0.0",
   "description": "evitaLab Desktop application",
   "main": ".vite/build/main.js",
@@ -8,12 +8,13 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx ."
+    "lint": "eslint --ext .ts,.tsx .",
+    "test": "vitest"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.6.0",
     "@electron-forge/maker-deb": "^7.6.0",
+    "@electron-forge/maker-dmg": "^7.8.0",
     "@electron-forge/maker-rpm": "^7.6.0",
     "@electron-forge/maker-squirrel": "^7.6.0",
     "@electron-forge/maker-zip": "^7.6.0",
@@ -21,15 +22,23 @@
     "@electron-forge/plugin-fuses": "^7.6.0",
     "@electron-forge/plugin-vite": "^7.6.0",
     "@electron/fuses": "^1.8.0",
+    "@fetch-mock/vitest": "^0.2.13",
+    "@reforged/maker-appimage": "^5.0.0",
+    "@types/decompress": "^4.2.7",
+    "@types/electron-squirrel-startup": "^1.0.2",
+    "@types/xxhashjs": "^0.2.4",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "@vitejs/plugin-vue": "^5.2.1",
-    "electron": "33.2.1",
+    "electron": "^35.1.4",
     "eslint": "^8.0.1",
     "eslint-plugin-import": "^2.25.0",
+    "sass": "^1.83.1",
     "ts-node": "^10.0.0",
     "typescript": "~4.5.4",
-    "vite": "^5.0.12"
+    "vite": "^5.0.12",
+    "vite-plugin-vuetify": "^2.0.4",
+    "vuetify": "^3.7.6"
   },
   "keywords": [],
   "author": {
@@ -38,8 +47,23 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "@mdi/font": "^7.4.47",
+    "@types/markdown-it": "^14.1.2",
+    "@types/markdown-it-emoji": "^3.0.1",
+    "decompress": "^4.2.1",
     "electron-log": "^5.2.4",
     "electron-squirrel-startup": "^1.0.1",
-    "vue": "^3.5.13"
+    "immutable": "^5.0.3",
+    "ky": "^1.7.5",
+    "markdown-it": "^14.1.0",
+    "markdown-it-emoji": "^3.0.0",
+    "semver": "^7.7.1",
+    "update-electron-app": "^3.1.1",
+    "uuid": "^11.1.0",
+    "vitest": "^3.0.9",
+    "vue": "^3.5.13",
+    "vue-i18n": "^11.0.1",
+    "vue-toastification": "^2.0.0-rc.5",
+    "vuedraggable": "^4.1.0"
   }
 }

@@ -1,0 +1,33 @@
+@use 'colors';
+
+.v-chip--variant-outlined {
+  border: 0.0625rem solid colors.$gray-light !important;
+  color: colors.$gray-light !important;
+  transition: all .2s linear;
+
+  .v-chip__overlay,
+  .v-chip__underlay {
+    display: none;
+  }
+
+  &:hover {
+    border: 0.0625rem solid rgba(colors.$primary-lightest, .5) !important;
+    color: rgba(colors.$primary-lightest, .5) !important;
+  }
+
+  &.v-chip--selected {
+    border: 0.0625rem solid colors.$primary-lightest !important;
+    color: colors.$primary-lightest !important;
+  }
+}
+
+.v-chip--variant-plain {
+  cursor: default;
+  opacity: 1;
+  color: colors.$gray-light !important;
+  background-color: colors.$gray-dark;
+}
+
+.v-chip--variant-flat {
+  cursor: default;
+}
