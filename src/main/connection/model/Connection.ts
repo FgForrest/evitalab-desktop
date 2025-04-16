@@ -31,6 +31,7 @@ export class Connection {
         this.serverUrl = serverUrl
         this.driverVersion = driverVersion
         this.styling.color = styling.color
+        this.styling.environment = styling.environment
     }
 
     private validateAndNormalizeUrl(url: string): string {

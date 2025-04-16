@@ -4,6 +4,7 @@ import { app } from 'electron'
 import fs from 'node:fs/promises'
 import { EventEmitter } from 'events'
 import log from 'electron-log/main'
+import { ConnectionEnvironment } from '../../connection/model/ConnectionEnvironment'
 
 /**
  * Gets emitted when the app config gets updated with new data
@@ -75,6 +76,7 @@ export interface ConnectionConfig {
 export interface ConnectionStylingConfig {
 
     readonly color: string | undefined
+    readonly environment: ConnectionEnvironment | undefined
 }
 
 interface StorableConfig {

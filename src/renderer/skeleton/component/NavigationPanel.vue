@@ -4,7 +4,7 @@
  */
 
 import ConnectionAvatar from './ConnectionAvatar.vue'
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { ConnectionId } from '../../../main/connection/model/ConnectionId'
 import { NAVIGATION_PANEL_URL } from '../../navigation-panel/navigationPanelConstants'
 import {
@@ -15,6 +15,7 @@ import { ConnectionDto } from '../../../common/ipc/connection/model/ConnectionDt
 import { FrontendAppUpdateManagerIpc } from '../../../preload/renderer/ipc/update/service/FrontendAppUpdateManagerIpc'
 import { useI18n } from 'vue-i18n'
 import { Toaster, useToaster } from '../../notification/service/Toaster'
+import { ConnectionEnvironment } from '../../../main/connection/model/ConnectionEnvironment'
 
 const appUpdateManager: FrontendAppUpdateManagerIpc = window.labAppUpdateManager
 const connectionManager: FrontendConnectionManagerIpc = window.labConnectionManager
@@ -86,6 +87,32 @@ function openNavigationPanel(): void {
 const appUpdateAvailable = ref<boolean>(false)
 appUpdateManager.isUpdateAvailable()
     .then(it => appUpdateAvailable.value = it)
+
+
+const activatedConnectionDetail = ref<ConnectionDto | undefined>(undefined)
+watch(
+    [activatedConnections, connections],
+    async () => {
+        if (activatedConnections.value.length != 1) {
+            activatedConnectionDetail.value = undefined
+        } else {
+            activatedConnectionDetail.value = await connectionManager.getConnection(activatedConnections.value[0])
+        }
+    }
+)
+const activatedConnectionEnvironment = computed<ConnectionEnvironment | undefined>(() => {
+    if (activatedConnectionDetail.value == undefined) {
+        return undefined
+    }
+    return activatedConnectionDetail.value.styling.environment
+})
+const panelColor = computed<string | undefined>(() => {
+    switch (activatedConnectionEnvironment.value) {
+        case ConnectionEnvironment.Production: return '#6b1810' // darkened Vuetify error color
+        case ConnectionEnvironment.Test: return '#6b4811' // darkened Vuetify warning color
+        default: return undefined
+    }
+})
 </script>
 
 <template>
@@ -93,7 +120,8 @@ appUpdateManager.isUpdateAvailable()
         :model-value="modelValue"
         permanent
         rail
-        class="bg-primary-dark"
+        :class="{ 'bg-primary-dark': activatedConnectionEnvironment == undefined || activatedConnectionEnvironment === ConnectionEnvironment.Development }"
+        :color="panelColor"
         @mouseenter="userHovering = true"
         @mouseleave="userHovering = false"
     >
@@ -195,7 +223,7 @@ appUpdateManager.isUpdateAvailable()
     & :deep(.v-list-item--active > .v-list-item__overlay) {
         background: colors.$primary-lightest;
         opacity: 1;
-        border-radius: 50%;
+        border-radius: 4px;
         width: 2.5rem;
         height: 2.5rem;
     }

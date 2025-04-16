@@ -130,13 +130,6 @@
             "duplicate": "Different connection with similar name already exists."
           }
         },
-        "shortConnectionName": {
-          "label": "Short connection name",
-          "hint": "Helps quickly identify connection in tight spaces",
-          "validations": {
-            "tooLong": "Short connection name cannot be longer that 3 characters."
-          }
-        },
         "serverUrl": {
           "label": "Server URL",
           "hint": "Base scheme://hostname:port of evitaLab API configured on the server you want to connect to.",
@@ -153,6 +146,15 @@
         "color": {
           "label": "Color",
           "hint": "Helps distinguish connections among each other"
+        },
+        "environment": {
+          "label": "Environment",
+          "hint": "Helps distinguish connections of single project among different environments.",
+          "type": {
+            "development": "Development",
+            "test": "Test",
+            "production": "Production"
+          }
         }
       },
       "button": {

@@ -56,7 +56,8 @@ export class ConnectionManager extends EventEmitter {
                             connectionConfig.serverUrl,
                             connectionConfig.driverVersion,
                             new ConnectionStyling(
-                                connectionConfig.styling.color
+                                connectionConfig.styling.color,
+                                connectionConfig.styling.environment
                             )
                         )
                         return [connectionConfig.id, connection] as [ConnectionId, Connection]
@@ -171,7 +172,8 @@ export class ConnectionManager extends EventEmitter {
                     serverUrl: connection.serverUrl,
                     driverVersion: connection.driverVersion,
                     styling: {
-                        color: connection.styling.color
+                        color: connection.styling.color,
+                        environment: connection.styling.environment
                     }
                 }
             })

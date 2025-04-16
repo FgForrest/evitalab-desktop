@@ -16,12 +16,7 @@ import ModalWindow from '../../common/component/ModalWindow.vue'
 import { Toaster, useToaster } from '../../notification/service/Toaster'
 import debounce from '../../util/debounce'
 import { ServerMetadataProvider } from './service/ServerMetadataProvider'
-
-enum ConnectionTestResult {
-    NotTested,
-    Success,
-    Failure
-}
+import { ConnectionEnvironment } from '../../../main/connection/model/ConnectionEnvironment'
 
 const connectionManager: FrontendConnectionManagerIpc = window.labConnectionManager
 const modalManager: FrontendModalManagerIpc = window.labModalManager
@@ -29,6 +24,27 @@ const driverManager: FrontendDriverManagerIpc = window.labDriverManager
 const toaster: Toaster = useToaster()
 const { t } = useI18n()
 const serverMetadataProvider: ServerMetadataProvider = new ServerMetadataProvider()
+
+enum ConnectionTestResult {
+    NotTested,
+    Success,
+    Failure
+}
+
+const availableEnvironments = [
+    {
+        title: t(`connection.editor.form.environment.type.${ConnectionEnvironment.Development}`),
+        value: ConnectionEnvironment.Development
+    },
+    {
+        title: t(`connection.editor.form.environment.type.${ConnectionEnvironment.Test}`),
+        value: ConnectionEnvironment.Test
+    },
+    {
+        title: t(`connection.editor.form.environment.type.${ConnectionEnvironment.Production}`),
+        value: ConnectionEnvironment.Production
+    }
+]
 
 const connectionId = ref<ConnectionId | undefined>(undefined)
 
@@ -66,6 +82,7 @@ const driverVersion = ref<string>('')
 const latestAvailableDriverVersion = ref<string>('')
 
 const color = ref<string | undefined>(undefined)
+const environment = ref<ConnectionEnvironment | undefined>(undefined)
 
 const isNew = computed<boolean>(() => connectionId.value == undefined)
 const downloadingDriver = ref<boolean>(false)
@@ -153,6 +170,7 @@ modalManager.onModalArgsPassed(async (url: string, args: any[]) => {
     serverUrl.value = existingConnection.serverUrl
     driverVersion.value = existingConnection.driverVersion
     color.value = existingConnection.styling.color == undefined ? '' : existingConnection.styling.color
+    environment.value = existingConnection.styling.environment
 })
 
 async function save(): Promise<boolean> {
@@ -198,7 +216,8 @@ async function save(): Promise<boolean> {
                 serverUrl: serverUrl.value,
                 driverVersion: finalDriverVersion,
                 styling: {
-                    color: finalColor
+                    color: finalColor,
+                    environment: environment.value
                 }
             })
 
@@ -215,6 +234,7 @@ async function save(): Promise<boolean> {
             existingConnection.serverUrl = serverUrl.value
             existingConnection.driverVersion = finalDriverVersion
             existingConnection.styling.color = finalColor
+            existingConnection.styling.environment = environment.value
             connectionManager.storeConnection(existingConnection)
 
             await toaster.success(t(
@@ -242,6 +262,7 @@ function reset(): void {
     driverVersion.value = ''
     latestAvailableDriverVersion.value = ''
     color.value = ''
+    environment.value = undefined
 }
 
 function close(): void {
@@ -303,11 +324,20 @@ function handleVisibilityChange(visible: boolean): void {
                     :rules="connectionNameRules"
                     required
                 />
-                <VColorSelect
-                    v-model="color"
-                    :label="t('connection.editor.form.color.label')"
-                    :hint="t('connection.editor.form.color.hint')"
-                />
+                <div class="styling-box">
+                    <VColorSelect
+                        v-model="color"
+                        :label="t('connection.editor.form.color.label')"
+                        :hint="t('connection.editor.form.color.hint')"
+                    />
+                    <VSelect
+                        v-model="environment"
+                        :label="t('connection.editor.form.environment.label')"
+                        :hint="t('connection.editor.form.environment.hint')"
+                        clearable
+                        :items="availableEnvironments"
+                    />
+                </div>
             </template>
 
             <template #confirm-button-body>
@@ -326,5 +356,10 @@ function handleVisibilityChange(visible: boolean): void {
 </template>
 
 <style lang="scss" scoped>
-
+.styling-box {
+    width: 100%;
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
 </style>

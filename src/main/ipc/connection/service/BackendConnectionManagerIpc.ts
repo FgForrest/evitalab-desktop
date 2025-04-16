@@ -46,7 +46,8 @@ export function initBackendConnectionManagerIpc(skeletonManager: SkeletonManager
                     connectionDto.serverUrl,
                     connectionDto.driverVersion,
                     new ConnectionStyling(
-                        connectionDto.styling.color
+                        connectionDto.styling.color,
+                        connectionDto.styling.environment
                     )
                 ))
             } else {
@@ -59,7 +60,8 @@ export function initBackendConnectionManagerIpc(skeletonManager: SkeletonManager
                     connectionDto.serverUrl,
                     connectionDto.driverVersion,
                     new ConnectionStyling(
-                        connectionDto.styling.color
+                        connectionDto.styling.color,
+                        connectionDto.styling.environment
                     )
                 )
                 await connectionManager.storeConnection(existingConnection)
@@ -172,7 +174,8 @@ function convertConnectionToDto(connection: Connection): ConnectionDto {
         serverUrl: connection.serverUrl,
         driverVersion: connection.driverVersion,
         styling: {
-            color: connection.styling.color
+            color: connection.styling.color,
+            environment: connection.styling.environment
         } as ConnectionStylingDto
     } as ConnectionDto
 }

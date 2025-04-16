@@ -5,8 +5,9 @@ import ConnectionAvatar from '../../skeleton/component/ConnectionAvatar.vue'
 import { CONNECTION_EDITOR_URL } from '../../connection/editor/connectionEditorConstants'
 import { FrontendModalManagerIpc } from '../../../preload/renderer/ipc/modal/service/FrontendModalManagerIpc'
 import { useI18n } from 'vue-i18n'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { CONNECTION_REMOVE_DIALOG_URL } from '../../connection/remove-dialog/connectionRemoveDialogConstants'
+import { ConnectionEnvironment } from '../../../main/connection/model/ConnectionEnvironment'
 
 const modalManager: FrontendModalManagerIpc = window.labModalManager
 
@@ -18,6 +19,13 @@ const props = defineProps<{
 }>()
 
 const actionsOpened = ref<boolean>(false)
+const itemColor = computed<string | undefined>(() => {
+    switch (props.connection.styling.environment) {
+        case ConnectionEnvironment.Production: return 'error'
+        case ConnectionEnvironment.Test: return 'warning'
+        default: return undefined
+    }
+})
 
 function editConnection(): void {
     modalManager.openModal(CONNECTION_EDITOR_URL, props.connection.id)
@@ -31,6 +39,7 @@ function removeConnection(): void {
 <template>
     <VListItem
         :value="connection.id"
+        :color="itemColor"
         @contextmenu.prevent="actionsOpened = true"
     >
         <template #prepend>
