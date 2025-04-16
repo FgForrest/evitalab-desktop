@@ -13,8 +13,7 @@ function closeNavigationPanel(): void {
 </script>
 
 <template>
-<!--    todo lho keydown not working-->
-    <ModalWindow @keydown.esc="closeNavigationPanel">
+    <ModalWindow>
         <Panel />
 
         <!-- color from modal background -->

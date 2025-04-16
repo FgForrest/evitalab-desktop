@@ -23,7 +23,6 @@ welcomeScreenManager.getBlogPosts().then((posts) => {
     blogPosts.value = posts
 })
 
-// todo lho hide content if connection is active
 </script>
 
 <template>
