@@ -43,8 +43,8 @@ export async function initialize(): Promise<void> {
     const skeletonManager: SkeletonManager = new SkeletonManager()
     const notificationManager: NotificationManager = new NotificationManager()
     const modalManager: ModalManager = new ModalManager()
-    const connectionManager: ConnectionManager = new ConnectionManager(appConfig)
     const driverManager: DriverManager = new DriverManager()
+    const connectionManager: ConnectionManager = new ConnectionManager(appConfig, driverManager)
     const instanceManager: InstanceManager = new InstanceManager(driverManager)
 
     // interconnect managers

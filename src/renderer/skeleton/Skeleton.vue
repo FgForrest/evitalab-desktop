@@ -18,9 +18,9 @@ connectionManager.onConnectionActivation((activated: ConnectionDto | undefined) 
 <template>
     <VApp>
         <!-- show minimized navigation panel if there is connection renderer -->
-        <NavigationPanel v-if="isConnectionActive" />
+        <NavigationPanel :model-value="isConnectionActive" />
         <!-- otherwise show full panel -->
-        <Panel v-else />
+        <Panel :model-value="!isConnectionActive" />
 
         <VMain :scrollable="false" class="main">
             <WelcomeScreen v-if="!isConnectionActive" />

@@ -22,6 +22,12 @@ const modalManager: FrontendModalManagerIpc = window.labModalManager
 const toaster: Toaster = useToaster()
 const { t } = useI18n()
 
+const props = withDefaults(defineProps<{
+    modelValue?: boolean
+}>(), {
+    modelValue: true
+})
+
 const userHovering = ref<boolean>(false)
 
 const activatedConnections = ref<ConnectionId[]>([])
@@ -33,6 +39,7 @@ connectionManager.getActiveConnection()
             activatedConnections.value = [it.id]
         }
     })
+const connectionsWithDriverUpdate = ref<ConnectionId[]>([])
 
 const connections = ref<ConnectionDto[]>([])
 connectionManager.getConnections()
@@ -46,8 +53,16 @@ connectionManager.onConnectionActivation((activated: ConnectionDto | undefined) 
     }
 })
 
-connectionManager.onConnectionsChange((newConnections: ConnectionDto[]) =>
-    connections.value = newConnections)
+connectionManager.onConnectionsChange((newConnections: ConnectionDto[]) => {
+    connections.value = newConnections
+    connectionsWithDriverUpdate.value = []
+})
+
+connectionManager.onDriverUpdateAvailable((connectionId: ConnectionId) => {
+    if (!connectionsWithDriverUpdate.value.includes(connectionId)) {
+        connectionsWithDriverUpdate.value.push(connectionId)
+    }
+})
 
 function selectConnection(item: any): void {
     try {
@@ -75,6 +90,7 @@ appUpdateManager.isUpdateAvailable()
 
 <template>
     <VNavigationDrawer
+        :model-value="modelValue"
         permanent
         rail
         class="bg-primary-dark"
@@ -105,9 +121,17 @@ appUpdateManager.isUpdateAvailable()
                 class="connection-items"
                 @click:select="selectConnection"
             >
-                <VListItem v-for="connection in connections" :key="connection.id" :value="connection.id">
-                    <ConnectionAvatar :connection="connection" />
-                </VListItem>
+                <VBadge
+                    v-for="connection in connections" :key="connection.id"
+                    :model-value="connectionsWithDriverUpdate.includes(connection.id)"
+                    color="warning"
+                    dot
+                    @click.right="openNavigationPanel"
+                >
+                    <VListItem :value="connection.id">
+                        <ConnectionAvatar :connection="connection" />
+                    </VListItem>
+                </VBadge>
             </VList>
         </template>
 

@@ -10,3 +10,5 @@ export const connectionManagerIpc_getActiveConnection = 'connectionManager:getAc
 
 export const connectionManagerIpc_onConnectionActivation = 'connectionManager:onConnectionActivation'
 export const connectionManagerIpc_onConnectionsChange = 'connectionManager:onConnectionsChange'
+
+export const connectionManagerIpc_onDriverUpdateAvailable = 'connectionManager:onDriverUpdateAvailable'

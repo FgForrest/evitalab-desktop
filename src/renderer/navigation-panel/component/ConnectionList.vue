@@ -31,6 +31,7 @@ connectionManager.getActiveConnection()
 const connections = ref<ConnectionDto[]>([])
 connectionManager.getConnections()
     .then((fetchedConnections: ConnectionDto[]) => connections.value = fetchedConnections)
+const connectionsWithDriverUpdate = ref<ConnectionId[]>([])
 
 connectionManager.onConnectionActivation((activated: ConnectionDto | undefined) => {
     if (activated != undefined) {
@@ -40,8 +41,16 @@ connectionManager.onConnectionActivation((activated: ConnectionDto | undefined) 
     }
 })
 
-connectionManager.onConnectionsChange((newConnections: ConnectionDto[]) =>
-    connections.value = newConnections)
+connectionManager.onConnectionsChange((newConnections: ConnectionDto[]) => {
+    connections.value = newConnections
+    connectionsWithDriverUpdate.value = []
+})
+
+connectionManager.onDriverUpdateAvailable((connectionId: ConnectionId) => {
+    if (!connectionsWithDriverUpdate.value.includes(connectionId)) {
+        connectionsWithDriverUpdate.value.push(connectionId)
+    }
+})
 
 function selectConnection(item: any): void {
     try {
@@ -114,7 +123,10 @@ function storeConnectionsOrder(): void {
             @end="storeConnectionsOrder"
         >
             <template #item="{ element }">
-                <ConnectionListItem :connection="(element as ConnectionDto)" />
+                <ConnectionListItem
+                    :connection="(element as ConnectionDto)"
+                    :driver-update-available="connectionsWithDriverUpdate.includes((element as ConnectionDto).id)"
+                />
             </template>
         </draggable>
     </VList>

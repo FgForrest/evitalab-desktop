@@ -13,7 +13,8 @@ const modalManager: FrontendModalManagerIpc = window.labModalManager
 const { t } = useI18n()
 
 const props = defineProps<{
-    connection: ConnectionDto
+    connection: ConnectionDto,
+    driverUpdateAvailable: boolean
 }>()
 
 const actionsOpened = ref<boolean>(false)
@@ -41,6 +42,15 @@ function removeConnection(): void {
         </template>
 
         <template #append>
+            <VChip
+                v-if="driverUpdateAvailable"
+                color="warning"
+                @click.stop="editConnection"
+                class="mr-2"
+            >
+                {{ t('navigation.panel.connection.item.button.driverUpdateAvailable') }}
+            </VChip>
+
             <VMenu v-model="actionsOpened">
                 <template #activator="{ props }">
                     <VIcon v-bind="props">

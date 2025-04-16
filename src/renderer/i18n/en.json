@@ -99,6 +99,9 @@
           "action": {
             "edit": "Edit connection",
             "remove": "Remove connection"
+          },
+          "button": {
+            "driverUpdateAvailable": "New driver"
           }
         },
         "notification": {

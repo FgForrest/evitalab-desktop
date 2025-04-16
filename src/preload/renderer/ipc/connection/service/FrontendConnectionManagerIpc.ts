@@ -6,7 +6,7 @@ import {
     connectionManagerIpc_getConnection,
     connectionManagerIpc_getConnections, connectionManagerIpc_getSimilarConnection,
     connectionManagerIpc_onConnectionActivation,
-    connectionManagerIpc_onConnectionsChange,
+    connectionManagerIpc_onConnectionsChange, connectionManagerIpc_onDriverUpdateAvailable,
     connectionManagerIpc_removeConnection,
     connectionManagerIpc_storeConnection, connectionManagerIpc_storeConnectionsOrder
 } from '../../../../../common/ipc/connection/service/ConnectionManagerIpc'
@@ -24,7 +24,8 @@ export interface FrontendConnectionManagerIpc {
     getSimilarConnection(connectionName: string): Promise<ConnectionDto | undefined>,
     getActiveConnection(): Promise<ConnectionDto | undefined>
     onConnectionActivation(listener: (activated: ConnectionDto | undefined) => void): void
-    onConnectionsChange(listener: (connections: ConnectionDto[]) => void): void
+    onConnectionsChange(listener: (connections: ConnectionDto[]) => void): void,
+    onDriverUpdateAvailable(listener: (connectionId: ConnectionId) => void): void
 }
 
 /**
@@ -61,6 +62,9 @@ export function exposeFrontendConnectionManagerIpc(): void {
         },
         onConnectionsChange(listener: (connections: ConnectionDto[]) => void): void {
             ipcRenderer.on(connectionManagerIpc_onConnectionsChange, (_event, connections) => listener(connections))
+        },
+        onDriverUpdateAvailable(listener: (connectionId: ConnectionId) => void) {
+            ipcRenderer.on(connectionManagerIpc_onDriverUpdateAvailable, (_event, connectionId) => listener(connectionId))
         }
     } as FrontendConnectionManagerIpc)
 }

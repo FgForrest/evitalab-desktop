@@ -2,7 +2,9 @@ import { ipcMain } from 'electron'
 import { ConnectionId } from '../../../connection/model/ConnectionId'
 import IpcMainEvent = Electron.IpcMainEvent
 import {
-    CONNECTION_MANAGER_EMIT_CONNECTION_ACTIVATION, CONNECTION_MANAGER_EMIT_CONNECTIONS_CHANGE,
+    CONNECTION_MANAGER_EMIT_CONNECTION_ACTIVATION,
+    CONNECTION_MANAGER_EMIT_CONNECTIONS_CHANGE,
+    CONNECTION_MANAGER_EMIT_DRIVER_UPDATE_AVAILABLE,
     ConnectionManager
 } from '../../../connection/service/ConnectionManager'
 import {
@@ -10,7 +12,7 @@ import {
     connectionManagerIpc_getConnection,
     connectionManagerIpc_getConnections, connectionManagerIpc_getSimilarConnection,
     connectionManagerIpc_onConnectionActivation,
-    connectionManagerIpc_onConnectionsChange,
+    connectionManagerIpc_onConnectionsChange, connectionManagerIpc_onDriverUpdateAvailable,
     connectionManagerIpc_removeConnection,
     connectionManagerIpc_storeConnection, connectionManagerIpc_storeConnectionsOrder
 } from '../../../../common/ipc/connection/service/ConnectionManagerIpc'
@@ -137,6 +139,18 @@ export function initBackendConnectionManagerIpc(skeletonManager: SkeletonManager
                 emitConnectionsChange(modal.webContents, connections))
         }
     )
+
+    connectionManager.on(
+        CONNECTION_MANAGER_EMIT_DRIVER_UPDATE_AVAILABLE,
+        (connectionId: ConnectionId) => {
+            emitDriverUpdateAvailable(
+                skeletonManager.skeletonWindow.webContents,
+                connectionId
+            )
+            modalManager.modals.forEach(modal =>
+                emitDriverUpdateAvailable(modal.webContents, connectionId))
+        }
+    )
 }
 
 function emitConnectionActivation(target: WebContents, connection: Connection | undefined): void {
@@ -145,6 +159,10 @@ function emitConnectionActivation(target: WebContents, connection: Connection | 
 
 function emitConnectionsChange(target: WebContents, connections: Connection[]): void {
     target.send(connectionManagerIpc_onConnectionsChange, connections.map(it => convertConnectionToDto(it)))
+}
+
+function emitDriverUpdateAvailable(target: WebContents, connectionId: ConnectionId): void {
+    target.send(connectionManagerIpc_onDriverUpdateAvailable, connectionId)
 }
 
 function convertConnectionToDto(connection: Connection): ConnectionDto {

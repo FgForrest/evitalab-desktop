@@ -4,6 +4,9 @@ import { List } from 'immutable'
 import { AppConfig } from '../../config/model/AppConfig'
 import { EventEmitter } from 'events'
 import { ConnectionStyling } from '../model/ConnectionStyling'
+import { DriverManager } from '../../driver/service/DriverManager'
+import { Driver } from '../../driver/model/Driver'
+import semver from 'semver/preload'
 
 /**
  * Gets emitted when a connection was activated.
@@ -19,18 +22,27 @@ export const CONNECTION_MANAGER_EMIT_CONNECTION_CHANGE = 'connectionChange'
 export const CONNECTION_MANAGER_EMIT_CONNECTIONS_CHANGE = 'connectionsChange'
 
 /**
+ * Gets emitted when there is newer driver available for activated connection
+ */
+export const CONNECTION_MANAGER_EMIT_DRIVER_UPDATE_AVAILABLE = 'driverUpdateAvailable'
+
+/**
  * Manages all evitaDB server connections. This is the main part of the desktop wrapper.
  */
 export class ConnectionManager extends EventEmitter {
 
     private readonly appConfig: AppConfig
+    private readonly driverManager: DriverManager
 
     private _connections: Map<ConnectionId, Connection> = new Map()
     private _activeConnection: ConnectionId | undefined = undefined
 
-    constructor(appConfig: AppConfig) {
+    private _connectionsCheckedForDriverUpdate: ConnectionId[] = []
+
+    constructor(appConfig: AppConfig, driverManager: DriverManager) {
         super()
         this.appConfig = appConfig
+        this.driverManager = driverManager
     }
 
     init(): void {
@@ -86,11 +98,17 @@ export class ConnectionManager extends EventEmitter {
         }
         this._activeConnection = connectionId
 
+        if (connectionId != undefined) {
+            // we don't want to wait for the update, just notify when we know it
+            this.checkForDriverUpdate(connectionId).then()
+        }
         this.notifyConnectionActivated()
     }
 
     async storeConnection(connection: Connection): Promise<void> {
         this._connections.set(connection.id, connection);
+
+        this.resetDriverUpdateInfo(connection.id)
 
         await this.updateConnectionsConfig()
         this.notifyConnectionChange(connection)
@@ -124,6 +142,24 @@ export class ConnectionManager extends EventEmitter {
 
         await this.updateConnectionsConfig()
         this.notifyConnectionsChange()
+    }
+
+    private async checkForDriverUpdate(connectionId: ConnectionId): Promise<void> {
+        if (!this._connectionsCheckedForDriverUpdate.includes(connectionId)) {
+            const connection: Connection = this.getConnection(connectionId)
+            const latestAvailableDriver: Driver = await this.driverManager.resolveLatestAvailableDriver(connection.serverUrl)
+            if (semver.gt(latestAvailableDriver.version, connection.driverVersion)) {
+                this.emit(CONNECTION_MANAGER_EMIT_DRIVER_UPDATE_AVAILABLE, connectionId)
+            }
+            this._connectionsCheckedForDriverUpdate.push(connectionId)
+        }
+    }
+
+    private resetDriverUpdateInfo(connectionId: ConnectionId): void {
+        const infoIndex: number = this._connectionsCheckedForDriverUpdate.findIndex(it => it === connectionId)
+        if (infoIndex > -1) {
+            this._connectionsCheckedForDriverUpdate.splice(infoIndex, 1)
+        }
     }
 
     private updateConnectionsConfig(): Promise<void> {
