@@ -3,14 +3,13 @@ import { i18n } from '../../../vue-plugins/i18n'
 
 export class ServerMetadataProvider {
 
-    async resolveServerName(serverUrl: string): Promise<string> {
-        console.log('resolve')
+    async resolveServerName(serverUrl: string): Promise<string | undefined> {
         try {
             const normalizedUrl = this.normalizeUrl(serverUrl)
             return await ky.get(`${normalizedUrl}system/server-name`).text()
         } catch (e) {
             console.error(`Could not resolve server name for URL '${serverUrl}': `, e)
-            return ''
+            return undefined
         }
     }
 

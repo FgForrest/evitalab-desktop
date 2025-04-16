@@ -145,7 +145,11 @@ async function testConnection(serverUrl: string): Promise<string | undefined> {
 
 const debouncedResolveSuggestedConnectionName = debounce(
     () => serverMetadataProvider.resolveServerName(serverUrl.value)
-        .then(name => suggestedConnectionName.value = name),
+        .then(name => {
+            if (name != undefined) {
+                suggestedConnectionName.value = name
+            }
+        }),
     500
 )
 
@@ -235,7 +239,7 @@ async function save(): Promise<boolean> {
             existingConnection.driverVersion = finalDriverVersion
             existingConnection.styling.color = finalColor
             existingConnection.styling.environment = environment.value
-            connectionManager.storeConnection(existingConnection)
+            await connectionManager.storeConnection(existingConnection)
 
             await toaster.success(t(
                 'connection.editor.notification.connectionUpdated',
