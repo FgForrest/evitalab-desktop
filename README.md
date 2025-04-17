@@ -69,7 +69,7 @@ This way you can access different evitaDB server versions from a single app with
 
 ## Download
 
-Binaries will be available soon for all major platforms (Windows, Linux, macOS). You will find them in [releases](https://github.com/FgForrest/evitalab-desktop/releases).
+Binaries are available for all major platforms (Windows, Linux, macOS). You can find them in [releases](https://github.com/FgForrest/evitalab-desktop/releases).
 
 _Note: evitaLab Desktop versioning is separate from the evitaLab core versioning. Just pick the newest desktop app version
 no matter your server version._
