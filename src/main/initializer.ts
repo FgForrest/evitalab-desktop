@@ -22,6 +22,7 @@ import { NotificationManager } from './notification/service/NotificationManager'
 import { initBackendNotificationManagerIpc } from './ipc/notification/service/BackendNotificationManagerIpc'
 import { AppUpdateManager } from './update/service/AppUpdateManager'
 import { initBackendAppUpdateManagerIpc } from './ipc/update/service/BackendAppUpdateManagerIpc'
+import { initializeLogger } from './log/logger'
 
 /**
  * Entrypoint of evitaLab app. Initializes the entire app.
@@ -29,7 +30,8 @@ import { initBackendAppUpdateManagerIpc } from './ipc/update/service/BackendAppU
 export async function initialize(): Promise<void> {
     Menu.setApplicationMenu(menu)
 
-    log.initialize();
+    initializeLogger()
+
     log.log('Initializing app...')
 
     // Handle creating/removing shortcuts on Windows when installing/uninstalling.

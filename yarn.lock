@@ -1130,6 +1130,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/github-url-to-object@^4.0.4":
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/@types/github-url-to-object/-/github-url-to-object-4.0.4.tgz#1e87db18af85be7ed5b74239e75a896f5a28094c"
+  integrity sha512-P2zPnqw2s272Sv+Gn7jHbyjhx9NBb6wQyM/D97wK2Fy1CXXm0D16dtSy87qzndzSwtRWq4i19ND3X1c72BleQA==
+
 "@types/glob-to-regexp@^0.4.4":
   version "0.4.4"
   resolved "https://registry.yarnpkg.com/@types/glob-to-regexp/-/glob-to-regexp-0.4.4.tgz#409e71290253203185b1ea8a3d6ea406a4bdc902"
@@ -1181,6 +1186,11 @@
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@types/mdurl/-/mdurl-2.0.0.tgz#d43878b5b20222682163ae6f897b20447233bdfd"
   integrity sha512-RGdgjQUZba5p6QEFAVx2OGb8rQDL/cPRG7GiedRzMcJ1tYnUANBncjbSB1NRGwbvjcPeikRABz2nshyPk1bhWg==
+
+"@types/ms@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@types/ms/-/ms-2.1.0.tgz#052aa67a48eccc4309d7f0191b7e41434b90bb78"
+  integrity sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==
 
 "@types/node@*", "@types/node@^22.7.7":
   version "22.14.0"
@@ -3322,7 +3332,7 @@ get-symbol-description@^1.1.0:
     es-errors "^1.3.0"
     get-intrinsic "^1.2.6"
 
-github-url-to-object@^4.0.4:
+github-url-to-object@^4.0.6:
   version "4.0.6"
   resolved "https://registry.yarnpkg.com/github-url-to-object/-/github-url-to-object-4.0.6.tgz#5ea8701dc8c336b8d582dc3fa5bf964165c3b365"
   integrity sha512-NaqbYHMUAlPcmWFdrAB7bcxrNIiiJWJe8s/2+iOc9vlcHlwHqSGrPk+Yi3nu6ebTwgsZEa7igz+NH2vEq3gYwQ==
@@ -5908,14 +5918,6 @@ upath@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/upath/-/upath-2.0.1.tgz#50c73dea68d6f6b990f51d279ce6081665d61a8b"
   integrity sha512-1uEe95xksV1O0CYKXo8vQvN1JEbtJp7lb7C5U9HMsIp6IVwntkH/oNUzyVNQSd4S1sYk2FpSSW44FqMc8qee5w==
-
-update-electron-app@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/update-electron-app/-/update-electron-app-3.1.1.tgz#d860a4e7a716ff4be675b5379d0f30c286e4595f"
-  integrity sha512-7duRr6sYn014tifhKgT/5i8N+6xLzmJVJ8hVtNrHXlIDNP6QbRe6VxZ1hSi2UH5oJPzhor/PH7yKU9em5xjRzQ==
-  dependencies:
-    github-url-to-object "^4.0.4"
-    ms "^2.1.1"
 
 uri-js@^4.2.2:
   version "4.4.1"

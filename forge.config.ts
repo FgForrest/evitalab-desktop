@@ -11,7 +11,7 @@ import { MakerDMG } from '@electron-forge/maker-dmg'
 
 const config: ForgeConfig = {
     packagerConfig: {
-        name: 'evitalab', // seems to be only for building, not displaying to user
+        name: 'evitaLab',
         asar: true,
         appCategoryType: 'public.app-category.developer-tools',
         icon: 'assets/icon/icon',
@@ -24,11 +24,12 @@ const config: ForgeConfig = {
     makers: [
         new MakerSquirrel(
             (arch: string) => ({
-                name: 'evitalab',
+                name: 'evitaLab',
                 authors: 'FgForrest a.s.',
-                exe: 'evitalab.exe',
+                exe: 'evitaLab.exe',
                 iconUrl:
                     'https://raw.githubusercontent.com/FgForrest/evitalab-desktop/dev/assets/icon/icon.ico',
+                loadingGif: 'assets/installer/installing.gif',
                 noMsi: true,
                 setupIcon: 'assets/icon/icon.ico'
             }),
