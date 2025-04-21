@@ -12,6 +12,7 @@ import { MakerDMG } from '@electron-forge/maker-dmg'
 const config: ForgeConfig = {
     packagerConfig: {
         name: 'evitaLab',
+        executableName: 'evitalab',
         asar: true,
         appCategoryType: 'public.app-category.developer-tools',
         icon: 'assets/icon/icon',
