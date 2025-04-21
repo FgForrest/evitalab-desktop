@@ -1,8 +1,8 @@
-import { updateElectronApp } from 'update-electron-app'
 import log from 'electron-log/main'
 import { app, shell } from 'electron'
 import ky from 'ky'
 import semver from 'semver/preload'
+import { updateElectronApp, UpdateSourceType } from './autoupdater'
 
 const LATEST_RELEASE_URL = 'https://api.github.com/repos/FgForrest/evitalab-desktop/releases/latest'
 
@@ -20,7 +20,18 @@ export class AppUpdateManager {
         }
 
         if (process.platform === 'win32') {
-            updateElectronApp()
+            // we delay this work by 10s to ensure that the app doesn't have to worry about updating during launch
+            // same thing as Electron Fiddle app does
+            setTimeout(() => {
+                updateElectronApp({
+                    updateSource: {
+                        type: UpdateSourceType.ElectronPublicUpdateService,
+                        repo: 'FgForrest/evitalab-desktop',
+                    },
+                    updateInterval: '1 hour',
+                    logger: log
+                })
+            }, 10000)
         } else {
             log.log('Not win32 platform, skipping auto update...')
         }
@@ -36,7 +47,7 @@ export class AppUpdateManager {
     }
 
     async isUpdateAvailable(): Promise<boolean> {
-        if (import.meta.env.DEV) {
+        if (import.meta.env.DEV || process.platform === 'win32') { // win32 has auto updater enabled
             return false
         }
 
@@ -48,7 +59,7 @@ export class AppUpdateManager {
                 const newestVersion: string = await this.resolveNewestAppVersionAvailable()
                 this.updateAvailable = semver.gt(newestVersion, currentVersion)
             } catch (e) {
-                log.error('Could resolve app update info: ', e)
+                log.error('Could not resolve app update info: ', e)
                 return false;
             }
         }
