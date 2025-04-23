@@ -38,7 +38,7 @@ evitaLab Desktop allows you to:
 - ✅ global notification system - displays toast notifications from desktop app and connections in one place
     - _this way you can see notifications from all connections all the time_
 
-As well as the features of the evitaLab core*:
+As well as the features of the [evitaLab core](https://github.com/FgForrest/evitalab)*:
 
 - ✅ inspect schemas
 - ✅ browse entities in interactive table
