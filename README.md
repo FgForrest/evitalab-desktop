@@ -38,7 +38,7 @@ evitaLab Desktop allows you to:
 - ✅ global notification system - displays toast notifications from desktop app and connections in one place
     - _this way you can see notifications from all connections all the time_
 
-As well as the features of the evitaLab core*:
+As well as the features of the [evitaLab core](https://github.com/FgForrest/evitalab)*:
 
 - ✅ inspect schemas
 - ✅ browse entities in interactive table
@@ -73,6 +73,19 @@ Binaries are available for all major platforms (Windows, Linux, macOS). You can 
 
 _Note: evitaLab Desktop versioning is separate from the evitaLab core versioning. Just pick the newest desktop app version
 no matter your server version._
+
+### macOS
+
+Newer macOS versions quarantine not-signed apps (we are working on it), therefore after installation, macOS may
+throw error saying the app is broken. To prevent that, execute following command after installation to get the app out of 
+the quarantine:
+
+```shell
+cd /Applications
+sudo xattr -d com.apple.quarantine evitaLab.app
+```
+
+### Other platforms
 
 For other platforms, you will have to clone the repository and configure the [Electron Forge](https://www.electronforge.io/)
 config for you platform and build it with:

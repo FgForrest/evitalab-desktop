@@ -7,6 +7,7 @@ import { ConnectionStyling } from '../model/ConnectionStyling'
 import { DriverManager } from '../../driver/service/DriverManager'
 import { Driver } from '../../driver/model/Driver'
 import semver from 'semver/preload'
+import log from 'electron-log/main'
 
 /**
  * Gets emitted when a connection was activated.
@@ -147,12 +148,16 @@ export class ConnectionManager extends EventEmitter {
 
     private async checkForDriverUpdate(connectionId: ConnectionId): Promise<void> {
         if (!this._connectionsCheckedForDriverUpdate.includes(connectionId)) {
-            const connection: Connection = this.getConnection(connectionId)
-            const latestAvailableDriver: Driver = await this.driverManager.resolveLatestAvailableDriver(connection.serverUrl)
-            if (semver.gt(latestAvailableDriver.version, connection.driverVersion)) {
-                this.emit(CONNECTION_MANAGER_EMIT_DRIVER_UPDATE_AVAILABLE, connectionId)
+            try {
+                const connection: Connection = this.getConnection(connectionId)
+                const latestAvailableDriver: Driver = await this.driverManager.resolveLatestAvailableDriver(connection.serverUrl)
+                if (semver.gt(latestAvailableDriver.version, connection.driverVersion)) {
+                    this.emit(CONNECTION_MANAGER_EMIT_DRIVER_UPDATE_AVAILABLE, connectionId)
+                }
+                this._connectionsCheckedForDriverUpdate.push(connectionId)
+            } catch (e) {
+                log.warn(`Check for driver update wasn't successful for connection '${connectionId}': `, e)
             }
-            this._connectionsCheckedForDriverUpdate.push(connectionId)
         }
     }
 
