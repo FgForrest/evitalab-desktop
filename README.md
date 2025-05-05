@@ -31,6 +31,7 @@ evitaLab Desktop allows you to:
 
 - ✅ manage connections to multiple evitaDB instances
 - ✅ connect to any server version in one app
+    - _note: server version must be at least 2025.1, older versions of evitaLab were not yet backported to work in the driver mode_ 
 - ✅ receive evitaLab core updates as soon as they are released without waiting for server update
 - ✅ each connection stores its own tabs and history, even if each connection points to same server URL
     - _this is useful when you are using port forwarding for different server environments (prod, test, local) where local port is the same for each environment_
