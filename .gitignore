@@ -91,3 +91,5 @@ typings/
 out/
 
 .idea/
+
+dist/

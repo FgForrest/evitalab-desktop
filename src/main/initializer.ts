@@ -18,7 +18,11 @@ import {
 import { initBackendModalManagerIpc } from './ipc/modal/service/BackendModalManagerIpc'
 import { initBackendDriverManagerIpc } from './ipc/driver/service/BackendDriverManagerIpc'
 import menu from './menu'
-import { NotificationManager } from './notification/service/NotificationManager'
+import {
+    NOTIFICATION_MANAGER_EMIT_SOURCE_ACTIVATION_REQUEST,
+    NotificationManager
+} from './notification/service/NotificationManager'
+import { ConnectionId } from './connection/model/ConnectionId'
 import { initBackendNotificationManagerIpc } from './ipc/notification/service/BackendNotificationManagerIpc'
 import { AppUpdateManager } from './update/service/AppUpdateManager'
 import { initBackendAppUpdateManagerIpc } from './ipc/update/service/BackendAppUpdateManagerIpc'
@@ -62,6 +66,15 @@ export async function initialize(): Promise<void> {
             instanceManager.restartInstance(connection)
         }
     )
+    notificationManager.on(
+        NOTIFICATION_MANAGER_EMIT_SOURCE_ACTIVATION_REQUEST,
+        (connectionId: ConnectionId) => {
+            // a clicked notification wants its source connection visible; a missing/removed
+            // connection is legal (producers may outlive their connection) and ignored
+            connectionManager.activateConnection(connectionId)
+                .catch((e) => log.warn(`Could not activate connection ${connectionId} for notification click: ${e.message}`))
+        }
+    )
 
     // This method will wait for Electron until it has finished
     // initialization and is ready to create browser windows.
@@ -74,7 +87,7 @@ export async function initialize(): Promise<void> {
 
     // initialize structure
     initBackendAppUpdateManagerIpc(appUpdateManager)
-    initBackendNotificationManagerIpc(notificationManager)
+    initBackendNotificationManagerIpc(notificationManager, skeletonManager, modalManager)
     initBackendConnectionManagerIpc(skeletonManager, connectionManager, modalManager)
     initBackendModalManagerIpc(modalManager)
     initBackendDriverManagerIpc(driverManager)

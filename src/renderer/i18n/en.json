@@ -107,6 +107,21 @@
         "notification": {
           "couldNotActivateConnection": "Could not activate connection: {reason}"
         }
+      },
+      "notificationCenter": {
+        "icon": {
+          "alt": "Notifications"
+        },
+        "tooltip": "Notifications"
+      }
+    }
+  },
+  "notification": {
+    "center": {
+      "title": "Notifications",
+      "empty": "No notifications yet.",
+      "source": {
+        "unknownConnection": "Unknown connection"
       }
     }
   },

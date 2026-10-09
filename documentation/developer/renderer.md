@@ -20,6 +20,7 @@ identity for `ModalManager`. All entries are registered as Rollup inputs in
 | `connectionEditor` | `connection/editor/` | `ConnectionEditor.vue` | Add/edit connection form (`CONNECTION_EDITOR_URL`) |
 | `connectionRemoveDialog` | `connection/remove-dialog/` | `ConnectionRemoveDialog.vue` | Dangerous confirm dialog for removing a connection (`CONNECTION_REMOVE_DIALOG_URL`) |
 | `notificationPanel` | `notification/panel/` | `NotificationPanel.vue` | Transparent toast host window |
+| `notificationCenter` | `notification/center/` | `NotificationCenter.vue` | Modal listing full notification history (`NOTIFICATION_CENTER_URL`) |
 
 ## Shared initialization
 
@@ -113,6 +114,23 @@ Two-tier toast architecture (main-process side:
 - **The panel window** (`ToastificationIntegrator.ts`) listens on
   `labServicingNotificationManager` and renders/dismisses vue-toastification toasts (message
   truncated at ~65 chars), reporting clicks/closures back.
+- The severity → `mdi-*` icon mapping is shared between the panel and the center in
+  `notification/service/notificationSeverity.ts` (single source of truth).
+
+#### Notification center
+
+`notification/center/NotificationCenter.vue` (modal, `NOTIFICATION_CENTER_URL`) lists the full
+notification history — the place where the complete, untruncated message lives. Each row shows a
+severity icon, a source chip (the connection name for instance sources, resolved via
+`labConnectionManager.getConnection`; the app name for skeleton sources), the full multi-line
+message and a relative timestamp. Clicking a row calls `historyEntryClicked(id)` (which activates
+the source connection so a producer's detail view opens visibly) and closes the modal. On open it
+reloads the history via `getNotificationHistory()` and calls `markAllNotificationsRead()`; while
+open it reacts to `onHistoryChanged` to show newly-arriving notifications.
+
+The unread badge lives in the skeleton navigation rail (`skeleton/component/NavigationPanel.vue`,
+`#append` slot): an `mdi-bell-outline` in a `VBadge`, initialized from `getNotificationHistory()`
+and kept in sync via `onHistoryChanged`; clicking it opens the center modal.
 
 ### Welcome screen (`src/renderer/welcome-screen/`)
 
