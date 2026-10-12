@@ -10,6 +10,7 @@ const props = withDefaults(
     defineProps<{
         modelValue: boolean,
         maxWidth?: string | number,
+        width?: string | number,
         persistent?: boolean,
         scrollable?: boolean
     }>(),
@@ -28,6 +29,7 @@ const emit = defineEmits<{
     <VDialog
         :model-value="modelValue"
         :max-width="maxWidth"
+        :width="width"
         :persistent="persistent"
         :scrollable="scrollable"
         @update:model-value="emit('update:modelValue', $event)"

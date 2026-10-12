@@ -86,7 +86,9 @@ on the hamburger button. The rail background reflects the active connection's en
 
 `Panel.vue` (drawer, width 350) composed of `Header.vue` (logo = "go home", app name, `ManageMenu`
 with external help links), `ConnectionList.vue` (drag-and-drop reordering via `vuedraggable` →
-`storeConnectionsOrder`, add-connection button) and `Footer.vue` (Discord/docs links, build
+`storeConnectionsOrder`, add-connection button) and `Footer.vue` (Discord/docs links,
+notification center button with the same unread dot as the rail — closes the panel and opens the
+center modal, build
 version from `import.meta.env.VITE_BUILD_VERSION`, app-update button backed by
 `labAppUpdateManager`). `ConnectionListItem.vue` renders one connection with environment
 coloring, a context menu (edit/remove → opens the respective modal) and a "new driver" chip.
@@ -126,11 +128,16 @@ severity icon, a source chip (the connection name for instance sources, resolved
 message and a relative timestamp. Clicking a row calls `historyEntryClicked(id)` (which activates
 the source connection so a producer's detail view opens visibly) and closes the modal. On open it
 reloads the history via `getNotificationHistory()` and calls `markAllNotificationsRead()`; while
-open it reacts to `onHistoryChanged` to show newly-arriving notifications.
+open it reacts to `onHistoryChanged` to show newly-arriving notifications. The dialog spans 2/3
+of the window width (via the optional `width` prop of `VLabDialog`) and its bottom action bar
+holds a *Clear all* button calling `clearNotificationHistory()`.
 
 The unread badge lives in the skeleton navigation rail (`skeleton/component/NavigationPanel.vue`,
-`#append` slot): an `mdi-bell-outline` in a `VBadge`, initialized from `getNotificationHistory()`
-and kept in sync via `onHistoryChanged`; clicking it opens the center modal.
+`#append` slot, last item): an `mdi-bell-outline` in a red `dot` `VBadge` (no count — the rail is
+too narrow for a numeric badge), initialized from `getNotificationHistory()` and kept in sync via
+`onHistoryChanged`; clicking it opens the center modal. The click handler sits on an inner element
+rather than the `VListItem`, so — like the link items next to it — it has no hover overlay. The
+same button with the same unread dot is also in the navigation panel footer.
 
 ### Welcome screen (`src/renderer/welcome-screen/`)
 

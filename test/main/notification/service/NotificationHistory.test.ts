@@ -96,3 +96,19 @@ test('Should return a defensive copy from getAll', () => {
 
     expect(history.getAll().length).toBe(1)
 })
+
+test('Should remove all entries on clear', () => {
+    const history = new NotificationHistory()
+    history.add(entry('a'))
+    history.add(entry('b'))
+
+    expect(history.clear()).toBe(true)
+    expect(history.getAll()).toEqual([])
+    expect(history.unreadCount()).toBe(0)
+})
+
+test('Should report no change when clearing an empty history', () => {
+    const history = new NotificationHistory()
+
+    expect(history.clear()).toBe(false)
+})

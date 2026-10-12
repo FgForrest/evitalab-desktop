@@ -181,18 +181,6 @@ const panelColor = computed<string | undefined>(() => {
         <template #append>
             <!-- just a visual aid to help new users find hidden navigation panel -->
             <VList>
-                <VListItem @click="openNotificationCenter">
-                    <VBadge
-                        :model-value="unreadNotificationCount > 0"
-                        :content="unreadNotificationCount"
-                        color="error"
-                    >
-                        <VIcon>mdi-bell-outline</VIcon>
-                    </VBadge>
-                    <VTooltip activator="parent">
-                        {{ t('navigation.panel.notificationCenter.tooltip') }}
-                    </VTooltip>
-                </VListItem>
                 <VListItem>
                     <a href="https://evitadb.io/documentation" target="_blank">
                         <img src="/documentation.svg" :alt="t('navigation.panel.link.evitaDBDocumentation.icon.alt')">
@@ -214,6 +202,20 @@ const panelColor = computed<string | undefined>(() => {
                     prepend-icon="mdi-alert-decagram-outline"
                     color="warning"
                 ></VListItem>
+                <VListItem>
+                    <div class="notification-center-button" @click="openNotificationCenter">
+                        <VBadge
+                            :model-value="unreadNotificationCount > 0"
+                            color="error"
+                            dot
+                        >
+                            <VIcon>mdi-bell-outline</VIcon>
+                        </VBadge>
+                        <VTooltip activator="parent">
+                            {{ t('navigation.panel.notificationCenter.tooltip') }}
+                        </VTooltip>
+                    </div>
+                </VListItem>
             </VList>
         </template>
     </VNavigationDrawer>
@@ -228,6 +230,11 @@ const panelColor = computed<string | undefined>(() => {
     display: grid;
     justify-items: center;
     align-items: center;
+}
+
+.notification-center-button {
+    display: flex;
+    cursor: pointer;
 }
 
 .connection-items {

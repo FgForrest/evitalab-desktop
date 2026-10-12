@@ -38,7 +38,8 @@ export const NOTIFICATION_MANAGER_EMIT_NOTIFICATION_CLOSURE_REQUEST = 'notificat
  */
 export const NOTIFICATION_MANAGER_EMIT_SOURCE_ACTIVATION_REQUEST = 'notificationSourceActivationRequest'
 /**
- * Gets emitted when the notification history changes (entry added or read state changed). Carries
+ * Gets emitted when the notification history changes (entry added, read state changed or history
+ * cleared). Carries
  * the current unread count.
  */
 export const NOTIFICATION_MANAGER_EMIT_HISTORY_CHANGE = 'notificationHistoryChange'
@@ -103,6 +104,16 @@ export class NotificationManager extends EventEmitter {
      */
     markAllAsRead(): void {
         if (this._history.markAllRead()) {
+            this.emit(NOTIFICATION_MANAGER_EMIT_HISTORY_CHANGE, this._history.unreadCount())
+        }
+    }
+
+    /**
+     * Removes all history entries and notifies about the history change when something was
+     * actually removed. Live toasts are not affected.
+     */
+    clearHistory(): void {
+        if (this._history.clear()) {
             this.emit(NOTIFICATION_MANAGER_EMIT_HISTORY_CHANGE, this._history.unreadCount())
         }
     }
