@@ -79,14 +79,20 @@ survive). Reactions are wired in `initializer.ts`:
 
 The instance view loads `driver.executablePath` with `driver-preload.js` (which exposes only the
 notification producer API — see [IPC](ipc.md#notification)) and passes configuration to the
-evitaLab core via base64-encoded URL query parameters:
+evitaLab core via URL query parameters built by `constructDriverInstanceQuery(...)`
+(`src/main/instance/model/DriverInstanceQuery.ts`):
 
 | Query param | Value |
 |-------------|-------|
-| `evitalab` | `'true'` — driver mode marker |
+| `evitalab` | `'true'` — driver mode marker, the only raw (non-encoded) parameter |
 | `evitalab-server-name` | `btoa('desktop-<connectionId>')` — namespaces the driver's local storage, so every connection keeps its own tabs and history |
 | `evitalab-pconnections` | `btoa(JSON.stringify([PreconfiguredDriverConnection]))` — the single connection (name + server URL) the driver should use |
-| `evitalab-readonly` | `'true'` — the user must not edit connections from inside the driver |
+| `evitalab-readonly` | `btoa('true')` — the user must not edit connections from inside the driver |
+
+**Every `evitalab-*` parameter must be base64-encoded.** The evitaLab core decodes all of them
+from base64 (since core 2026.4 strictly — a non-base64 value aborts the driver bootstrap and the
+instance stays on the static loading screen), mirroring how the evitaDB server embeds evitaLab.
+The contract is guarded by `test/main/instance/model/DriverInstanceQuery.test.ts`.
 
 `PreconfiguredDriverConnection` lives in `src/main/instance/model/PreconfiguredDriverConnection.ts`.
 
