@@ -8,6 +8,9 @@ import { NotificationId } from '../model/NotificationId'
 import { v4 as uuidv4 } from 'uuid'
 import { Notification } from '../model/Notification'
 import { EventEmitter } from 'events'
+import { NotificationHistory } from './NotificationHistory'
+import { NotificationHistoryEntry } from '../model/NotificationHistoryEntry'
+import { InstanceNotificationSource } from '../model/InstanceNotificationSource'
 
 // these must be aligned with toastification renderer
 const toastWidth = 592
@@ -29,6 +32,17 @@ export const NOTIFICATION_MANAGER_EMIT_NOTIFICATION_CREATE = 'notificationCreate
  * Gets emitted when notification has been requested for closure
  */
 export const NOTIFICATION_MANAGER_EMIT_NOTIFICATION_CLOSURE_REQUEST = 'notificationClosureRequest'
+/**
+ * Gets emitted when a clicked notification requests activation of its source connection. Carries
+ * the `connectionId` of the originating instance.
+ */
+export const NOTIFICATION_MANAGER_EMIT_SOURCE_ACTIVATION_REQUEST = 'notificationSourceActivationRequest'
+/**
+ * Gets emitted when the notification history changes (entry added, read state changed or history
+ * cleared). Carries
+ * the current unread count.
+ */
+export const NOTIFICATION_MANAGER_EMIT_HISTORY_CHANGE = 'notificationHistoryChange'
 
 export class NotificationManager extends EventEmitter {
 
@@ -36,6 +50,7 @@ export class NotificationManager extends EventEmitter {
     private _notificationPanel: WebContentsView | undefined = undefined
 
     private readonly _notifications: Map<string, Notification> = new Map()
+    private readonly _history: NotificationHistory = new NotificationHistory()
 
     constructor() {
         super()
@@ -55,8 +70,10 @@ export class NotificationManager extends EventEmitter {
         const id: NotificationId = uuidv4()
         const newNotification: Notification = new Notification(id, sender, definition.severity, definition.source, definition.message)
         this._notifications.set(id, newNotification)
+        this._history.add(new NotificationHistoryEntry(newNotification, new Date()))
         this.updatePanelBounds()
         this.emit(NOTIFICATION_MANAGER_EMIT_NOTIFICATION_CREATE, this._notificationPanel, newNotification)
+        this.emit(NOTIFICATION_MANAGER_EMIT_HISTORY_CHANGE, this._history.unreadCount())
 
         return id
     }
@@ -70,8 +87,62 @@ export class NotificationManager extends EventEmitter {
     notificationClicked(id: NotificationId): void {
         const notification: Notification | undefined = this._notifications.get(id)
         if (notification != undefined) {
-            notification.click()
+            this.routeNotificationClick(notification)
         }
+    }
+
+    /**
+     * Returns the current notification history, newest first.
+     */
+    getHistory(): NotificationHistoryEntry[] {
+        return this._history.getAll()
+    }
+
+    /**
+     * Marks all history entries as read and notifies about the history change when something
+     * actually changed.
+     */
+    markAllAsRead(): void {
+        if (this._history.markAllRead()) {
+            this.emit(NOTIFICATION_MANAGER_EMIT_HISTORY_CHANGE, this._history.unreadCount())
+        }
+    }
+
+    /**
+     * Removes all history entries and notifies about the history change when something was
+     * actually removed. Live toasts are not affected.
+     */
+    clearHistory(): void {
+        if (this._history.clear()) {
+            this.emit(NOTIFICATION_MANAGER_EMIT_HISTORY_CHANGE, this._history.unreadCount())
+        }
+    }
+
+    /**
+     * Returns the number of unread notifications in the history.
+     */
+    unreadCount(): number {
+        return this._history.unreadCount()
+    }
+
+    /**
+     * Routes a click on a history entry the same way as a live toast click (activates the source
+     * connection and notifies the producer). No-op when the entry is no longer in the history.
+     */
+    historyEntryClicked(id: NotificationId): void {
+        const entry: NotificationHistoryEntry | undefined = this._history.get(id)
+        if (entry != undefined) {
+            this.routeNotificationClick(entry.notification)
+        }
+    }
+
+    private routeNotificationClick(notification: Notification): void {
+        // activate the source connection first so the producer's click callback (e.g. evitaLab
+        // core opening an error detail tab) runs in a visible instance
+        if (notification.source instanceof InstanceNotificationSource) {
+            this.emit(NOTIFICATION_MANAGER_EMIT_SOURCE_ACTIVATION_REQUEST, notification.source.connectionId)
+        }
+        notification.click()
     }
 
     notificationClosed(id: NotificationId): void {

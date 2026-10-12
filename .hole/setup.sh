@@ -12,6 +12,7 @@ fi
 . "${NVM_DIR}/nvm.sh"
 nvm install 22
 nvm use 22
+nvm alias default 22
 
 # install yarn
 
@@ -41,18 +42,3 @@ AB_BIN="$HOME/.nvm/versions/node/$NODE_VERSION/bin/agent-browser"
 exec "$AB_BIN" "$@"
 EOF
 chmod +x "${HOME}/.local/bin/agent-browser"
-
-# rtk
-# Note: enable if needed, but beware of the security implications
-echo "➡️ Installing rtk..."
-curl -fsSL https://raw.githubusercontent.com/novoj/rtk/refs/heads/master/install.sh | sh
-
-export PATH="$HOME/.local/bin:$PATH"
-
-if ! command -v rtk >/dev/null 2>&1; then
-  echo "ERROR: rtk was installed but is still not in PATH" >&2
-  exit 1
-fi
-
-echo "➡️ Initializing rtk..."
-rtk init -g

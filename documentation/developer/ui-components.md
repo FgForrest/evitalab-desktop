@@ -37,7 +37,7 @@ Icons are [Material Design Icons](https://pictogrammers.com/library/mdi/) (`mdi-
 
 | Component | Use for |
 |-----------|---------|
-| `VLabDialog` | Every plain dialog. Props: `modelValue`, `maxWidth?` (default `36rem`), `persistent?`, `scrollable?`; slots: `activator`, `title`, `title-actions`, default (body), `alternative-action-button`, `reject-button`, `confirm-button` |
+| `VLabDialog` | Every plain dialog. Props: `modelValue`, `maxWidth?` (default `36rem`), `width?`, `persistent?`, `scrollable?`; slots: `activator`, `title`, `title-actions`, default (body), `alternative-action-button`, `reject-button`, `confirm-button` |
 | `VFormDialog` | Dialogs containing a form. Built-in Vuetify form + validation handling, submit/loading state, reset support. Key props: `modelValue`, `changed` (enables confirm), `dangerous?` (red confirm), `confirmButtonIcon?`, `confirm: () => Promise<boolean>` (return `false` to keep open), `reset?`; slots: `activator`, `title`, `prepend-form`, default (fields), `append-form`, `confirm-button-body`. Exposes `validateForm()` |
 | `VConfirmDialog` | Secondary "are you sure" prompt — usually not used directly, it is driven by `VConfirmDialogButton` |
 | `VConfirmDialogButton` | Confirm action button; with `dangerous` (boolean or `DangerousConfirmType`) it is error-colored and first opens a `VConfirmDialog` |

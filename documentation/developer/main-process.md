@@ -67,23 +67,49 @@ Model (`src/main/notification/model/`): `NotificationDefinition { severity, sour
 `NotificationSeverity` (`success`/`info`/`warning`/`error`), `NotificationSource` — either
 `SkeletonNotificationSource` (`type: 'skeleton'`) or `InstanceNotificationSource`
 (`type: 'instance'`, carries `connectionId`). A stored `Notification` additionally has a uuid
-`id` and the originating `WebContents` as `sender`.
+`id` and the originating `WebContents` as `sender`. A `NotificationHistoryEntry` wraps a
+`Notification` with its `createdAt` timestamp and a mutable `read` flag.
 
 Flow:
 
 1. A producer (driver instance or desktop shell renderer) calls
    `window.labNotificationManager.addNotification(definition)`.
 2. `NotificationManager.addNotification(sender, definition)` stores the notification with the
-   sender's `WebContents` and emits `NOTIFICATION_MANAGER_EMIT_NOTIFICATION_CREATE`.
+   sender's `WebContents`, appends it to the history and emits
+   `NOTIFICATION_MANAGER_EMIT_NOTIFICATION_CREATE` and `NOTIFICATION_MANAGER_EMIT_HISTORY_CHANGE`.
 3. The backend IPC pushes `onNotificationCreated` to the **notification panel** window, which
    renders the toast (vue-toastification — see [renderer windows](renderer.md#notification-panel)).
 4. Toast click/close is reported back by the panel via `labServicingNotificationManager`;
    `NotificationManager` routes `onNotificationClicked`/`onNotificationClosed` **back to the
    original sender** `WebContents` — this is how a driver instance can react to its own toast
-   being clicked.
+   being clicked. Every `sender.send(...)` is guarded by `sender.isDestroyed()` because history
+   entries can outlive their producing view.
 5. A producer may programmatically dismiss its toast via `requestNotificationClosure(id)`.
 
-The two IPC surfaces (producer-facing `NotificationManagerIpc` vs. panel-facing
+### Notification history & center
+
+Toasts are short-lived teasers (max 5 visible, message truncated to ~65 chars, auto-dismiss), so
+their full content would otherwise be unrecoverable. `NotificationManager` therefore keeps a
+bounded **in-memory** history (`NotificationHistory` — a pure, Electron-free ring buffer, newest
+first, capped at 100 entries, **not persisted** across restarts). It is surfaced by a
+[notification center modal](renderer.md#notification-center) and an unread badge in the skeleton
+navigation rail.
+
+- `getHistory()`, `unreadCount()`, `markAllAsRead()`, `clearHistory()` and `historyEntryClicked(id)` back the
+  servicing IPC (see [IPC](ipc.md#notification)).
+- **Click → source connection activation.** When a clicked toast **or** history row comes from an
+  `InstanceNotificationSource`, `NotificationManager` emits
+  `NOTIFICATION_MANAGER_EMIT_SOURCE_ACTIVATION_REQUEST` with the `connectionId` **before** routing
+  the click to the producer. `initializer.ts` wires it to `connectionManager.activateConnection(id)`
+  (fire-and-forget; a missing/removed connection is logged and ignored) so the producer's
+  click-through (e.g. evitaLab core's error viewer tab) opens in a **visible** instance rather than
+  a hidden one.
+- `NOTIFICATION_MANAGER_EMIT_HISTORY_CHANGE` (carrying the current unread count) is fired on add
+  on mark-all-read and on clear (the latter two only when something actually changed); clearing
+  the history does not dismiss live toasts. The backend IPC fans it out to the
+  skeleton and every modal so the badge stays in sync.
+
+The two IPC surfaces (producer-facing `NotificationManagerIpc` vs. panel/center/badge-facing
 `ServicingNotificationManagerIpc`) are described in [IPC](ipc.md#notification).
 
 ## App updates

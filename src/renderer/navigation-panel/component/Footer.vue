@@ -4,8 +4,16 @@
 import { useI18n } from 'vue-i18n'
 import { computed, ref } from 'vue'
 import { FrontendAppUpdateManagerIpc } from '../../../preload/renderer/ipc/update/service/FrontendAppUpdateManagerIpc'
+import { FrontendModalManagerIpc } from '../../../preload/renderer/ipc/modal/service/FrontendModalManagerIpc'
+import {
+    FrontendServicingNotificationManagerIpc
+} from '../../../preload/renderer/ipc/notification/service/FrontendServicingNotificationManagerIpc'
+import { NAVIGATION_PANEL_URL } from '../navigationPanelConstants'
+import { NOTIFICATION_CENTER_URL } from '../../notification/center/notificationCenterConstants'
 
 const appUpdateManager: FrontendAppUpdateManagerIpc = window.labAppUpdateManager
+const modalManager: FrontendModalManagerIpc = window.labModalManager
+const servicingNotificationManager: FrontendServicingNotificationManagerIpc = window.labServicingNotificationManager
 const { t } = useI18n()
 
 const version = computed(() => {
@@ -20,6 +28,17 @@ const appUpdateAvailable = ref<boolean>(false)
 appUpdateManager.isUpdateAvailable()
     .then(it => appUpdateAvailable.value = it)
 
+const unreadNotificationCount = ref<number>(0)
+servicingNotificationManager.getNotificationHistory()
+    .then(history => unreadNotificationCount.value = history.filter(it => !it.read).length)
+servicingNotificationManager.onHistoryChanged((unreadCount: number) =>
+    unreadNotificationCount.value = unreadCount)
+
+function openNotificationCenter(): void {
+    modalManager.closeModal(NAVIGATION_PANEL_URL)
+    modalManager.openModal(NOTIFICATION_CENTER_URL)
+}
+
 </script>
 
 <template>
@@ -27,6 +46,18 @@ appUpdateManager.isUpdateAvailable()
 
     <footer class="navigation-panel-footer">
         <ul class="lab-nav-links">
+            <li class="notification-center-link" @click="openNotificationCenter">
+                <VBadge
+                    :model-value="unreadNotificationCount > 0"
+                    color="error"
+                    dot
+                >
+                    <VIcon>mdi-bell-outline</VIcon>
+                </VBadge>
+                <VTooltip activator="parent">
+                    {{ t('navigation.panel.notificationCenter.tooltip') }}
+                </VTooltip>
+            </li>
             <li>
                 <a href="https://discord.gg/VsNBWxgmSw" target="_blank">
                     <img src="/discord.svg" :alt="t('navigation.panel.link.discord.icon.alt')">
@@ -107,6 +138,16 @@ appUpdateManager.isUpdateAvailable()
 
 .lab-nav-links li:hover img {
     opacity: 1;
+}
+
+.notification-center-link {
+    cursor: pointer;
+    opacity: .5;
+    transition: opacity .2s ease-in-out;
+
+    &:hover {
+        opacity: 1;
+    }
 }
 
 .app-version {
