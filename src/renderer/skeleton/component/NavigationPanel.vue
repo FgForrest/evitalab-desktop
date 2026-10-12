@@ -7,10 +7,14 @@ import ConnectionAvatar from './ConnectionAvatar.vue'
 import { computed, ref, watch } from 'vue'
 import { ConnectionId } from '../../../main/connection/model/ConnectionId'
 import { NAVIGATION_PANEL_URL } from '../../navigation-panel/navigationPanelConstants'
+import { NOTIFICATION_CENTER_URL } from '../../notification/center/notificationCenterConstants'
 import {
     FrontendConnectionManagerIpc
 } from '../../../preload/renderer/ipc/connection/service/FrontendConnectionManagerIpc'
 import { FrontendModalManagerIpc } from '../../../preload/renderer/ipc/modal/service/FrontendModalManagerIpc'
+import {
+    FrontendServicingNotificationManagerIpc
+} from '../../../preload/renderer/ipc/notification/service/FrontendServicingNotificationManagerIpc'
 import { ConnectionDto } from '../../../common/ipc/connection/model/ConnectionDto'
 import { FrontendAppUpdateManagerIpc } from '../../../preload/renderer/ipc/update/service/FrontendAppUpdateManagerIpc'
 import { useI18n } from 'vue-i18n'
@@ -20,6 +24,7 @@ import { ConnectionEnvironment } from '../../../main/connection/model/Connection
 const appUpdateManager: FrontendAppUpdateManagerIpc = window.labAppUpdateManager
 const connectionManager: FrontendConnectionManagerIpc = window.labConnectionManager
 const modalManager: FrontendModalManagerIpc = window.labModalManager
+const servicingNotificationManager: FrontendServicingNotificationManagerIpc = window.labServicingNotificationManager
 const toaster: Toaster = useToaster()
 const { t } = useI18n()
 
@@ -82,6 +87,16 @@ function selectConnection(item: any): void {
 
 function openNavigationPanel(): void {
     modalManager.openModal(NAVIGATION_PANEL_URL)
+}
+
+const unreadNotificationCount = ref<number>(0)
+servicingNotificationManager.getNotificationHistory()
+    .then(history => unreadNotificationCount.value = history.filter(it => !it.read).length)
+servicingNotificationManager.onHistoryChanged((unreadCount: number) =>
+    unreadNotificationCount.value = unreadCount)
+
+function openNotificationCenter(): void {
+    modalManager.openModal(NOTIFICATION_CENTER_URL)
 }
 
 const appUpdateAvailable = ref<boolean>(false)
@@ -187,6 +202,20 @@ const panelColor = computed<string | undefined>(() => {
                     prepend-icon="mdi-alert-decagram-outline"
                     color="warning"
                 ></VListItem>
+                <VListItem>
+                    <div class="notification-center-button" @click="openNotificationCenter">
+                        <VBadge
+                            :model-value="unreadNotificationCount > 0"
+                            color="error"
+                            dot
+                        >
+                            <VIcon>mdi-bell-outline</VIcon>
+                        </VBadge>
+                        <VTooltip activator="parent">
+                            {{ t('navigation.panel.notificationCenter.tooltip') }}
+                        </VTooltip>
+                    </div>
+                </VListItem>
             </VList>
         </template>
     </VNavigationDrawer>
@@ -201,6 +230,11 @@ const panelColor = computed<string | undefined>(() => {
     display: grid;
     justify-items: center;
     align-items: center;
+}
+
+.notification-center-button {
+    display: flex;
+    cursor: pointer;
 }
 
 .connection-items {

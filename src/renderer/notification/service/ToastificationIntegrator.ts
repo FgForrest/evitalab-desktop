@@ -5,13 +5,8 @@ import {
 } from '../../../preload/renderer/ipc/notification/service/FrontendServicingNotificationManagerIpc'
 import { NotificationSeverity } from '../../../main/notification/model/NotificationSeverity'
 import { NotificationDto } from '../../../common/ipc/notification/model/NotificationDto'
+import { notificationSeverityToIcon } from './notificationSeverity'
 
-const notificationSeverityToToastIconMapping: Map<string, string> = new Map([
-    [NotificationSeverity.Success, 'check-circle-outline'],
-    [NotificationSeverity.Info, 'information-outline'],
-    [NotificationSeverity.Warning, 'mdi-alert-outline'],
-    [NotificationSeverity.Error, 'alert-circle-outline']
-])
 const notificationSeverityToToastTypeMapping: Map<string, TYPE> = new Map([
     [NotificationSeverity.Success, TYPE.SUCCESS],
     [NotificationSeverity.Info, TYPE.INFO],
@@ -50,7 +45,7 @@ export class ToastificationIntegrator {
             {
                 id: notification.id,
                 type: notificationSeverityToToastTypeMapping.get(notification.severity),
-                icon: `mdi mdi-${notificationSeverityToToastIconMapping.get(notification.severity)}`,
+                icon: `mdi ${notificationSeverityToIcon.get(notification.severity)}`,
                 onClick: () => servicingNotificationManager.notificationClicked(notification.id),
                 onClose: () => servicingNotificationManager.notificationClosed(notification.id)
             }

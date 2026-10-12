@@ -26,10 +26,16 @@ export class Notification extends NotificationDefinition {
     }
 
     click(): void {
+        if (this.sender.isDestroyed()) {
+            return
+        }
         this.sender.send(notificationManagerIpc_onNotificationClicked, this.id)
     }
 
     close(): void {
+        if (this.sender.isDestroyed()) {
+            return
+        }
         this.sender.send(notificationManagerIpc_onNotificationClosed, this.id)
     }
 }
