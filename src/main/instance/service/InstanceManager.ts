@@ -2,7 +2,7 @@ import { ConnectionId } from '../../connection/model/ConnectionId'
 import { BrowserWindow, WebContentsView } from 'electron'
 import path from 'path'
 import { Connection } from '../../connection/model/Connection'
-import { PreconfiguredDriverConnection } from '../model/PreconfiguredDriverConnection'
+import { constructDriverInstanceQuery } from '../model/DriverInstanceQuery'
 import { DriverManager } from '../../driver/service/DriverManager'
 import { Driver } from '../../driver/model/Driver'
 import LoadFileOptions = Electron.LoadFileOptions
@@ -123,21 +123,8 @@ export class InstanceManager {
 
     private constructInstanceUrlOptions(connection: Connection): LoadFileOptions {
         return {
-            query: {
-                'evitalab': 'true',
-                'evitalab-server-name': btoa(this.constructServerNameForInstance(connection)),
-                'evitalab-pconnections': btoa(JSON.stringify(this.constructPreconfiguredConnectionsForInstance(connection))),
-                'evitalab-readonly': 'true'
-            }
+            query: constructDriverInstanceQuery(connection)
         }
-    }
-
-    private constructServerNameForInstance(connection: Connection): string {
-        return `desktop-${connection.id}`
-    }
-
-    private constructPreconfiguredConnectionsForInstance(connection: Connection): PreconfiguredDriverConnection[] {
-        return [PreconfiguredDriverConnection.fromConnection(connection)]
     }
 
     private constructViewBounds(): Rectangle {
