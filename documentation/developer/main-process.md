@@ -95,7 +95,7 @@ first, capped at 100 entries, **not persisted** across restarts). It is surfaced
 [notification center modal](renderer.md#notification-center) and an unread badge in the skeleton
 navigation rail.
 
-- `getHistory()`, `unreadCount()`, `markAllAsRead()` and `historyEntryClicked(id)` back the
+- `getHistory()`, `unreadCount()`, `markAllAsRead()`, `clearHistory()` and `historyEntryClicked(id)` back the
   servicing IPC (see [IPC](ipc.md#notification)).
 - **Click → source connection activation.** When a clicked toast **or** history row comes from an
   `InstanceNotificationSource`, `NotificationManager` emits
@@ -105,7 +105,8 @@ navigation rail.
   click-through (e.g. evitaLab core's error viewer tab) opens in a **visible** instance rather than
   a hidden one.
 - `NOTIFICATION_MANAGER_EMIT_HISTORY_CHANGE` (carrying the current unread count) is fired on add
-  and on mark-all-read (only when something actually changed); the backend IPC fans it out to the
+  on mark-all-read and on clear (the latter two only when something actually changed); clearing
+  the history does not dismiss live toasts. The backend IPC fans it out to the
   skeleton and every modal so the badge stays in sync.
 
 The two IPC surfaces (producer-facing `NotificationManagerIpc` vs. panel/center/badge-facing

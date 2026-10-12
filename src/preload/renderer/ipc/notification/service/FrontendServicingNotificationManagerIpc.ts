@@ -3,6 +3,7 @@ import { NotificationDto } from '../../../../../common/ipc/notification/model/No
 import { NotificationHistoryEntryDto } from '../../../../../common/ipc/notification/model/NotificationHistoryEntryDto'
 import { contextBridge, ipcRenderer } from 'electron'
 import {
+    servicingNotificationManagerIpc_clearNotificationHistory,
     servicingNotificationManagerIpc_getNotificationHistory,
     servicingNotificationManagerIpc_historyEntryClicked,
     servicingNotificationManagerIpc_markAllNotificationsRead,
@@ -25,6 +26,7 @@ export interface FrontendServicingNotificationManagerIpc {
 
     getNotificationHistory(): Promise<NotificationHistoryEntryDto[]>,
     markAllNotificationsRead(): void,
+    clearNotificationHistory(): void,
     historyEntryClicked(id: NotificationId): void,
     onHistoryChanged(listener: (unreadCount: number) => void): void
 }
@@ -56,6 +58,9 @@ export function exposeFrontendServicingNotificationManagerIpc(): void {
         },
         markAllNotificationsRead(): void {
             ipcRenderer.send(servicingNotificationManagerIpc_markAllNotificationsRead)
+        },
+        clearNotificationHistory(): void {
+            ipcRenderer.send(servicingNotificationManagerIpc_clearNotificationHistory)
         },
         historyEntryClicked(id: NotificationId): void {
             ipcRenderer.send(servicingNotificationManagerIpc_historyEntryClicked, id)

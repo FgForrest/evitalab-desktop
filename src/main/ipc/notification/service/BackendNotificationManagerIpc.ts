@@ -20,6 +20,7 @@ import { NotificationDto } from '../../../../common/ipc/notification/model/Notif
 import { NotificationHistoryEntry } from '../../../notification/model/NotificationHistoryEntry'
 import { NotificationHistoryEntryDto } from '../../../../common/ipc/notification/model/NotificationHistoryEntryDto'
 import {
+    servicingNotificationManagerIpc_clearNotificationHistory,
     servicingNotificationManagerIpc_getNotificationHistory,
     servicingNotificationManagerIpc_historyEntryClicked,
     servicingNotificationManagerIpc_markAllNotificationsRead,
@@ -89,6 +90,12 @@ export function initBackendNotificationManagerIpc(notificationManager: Notificat
         servicingNotificationManagerIpc_markAllNotificationsRead,
         (): void => {
             notificationManager.markAllAsRead()
+        }
+    )
+    ipcMain.on(
+        servicingNotificationManagerIpc_clearNotificationHistory,
+        (): void => {
+            notificationManager.clearHistory()
         }
     )
     ipcMain.on(

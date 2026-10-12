@@ -97,6 +97,10 @@ function onEntryClicked(entry: NotificationHistoryEntryDto): void {
     close()
 }
 
+function clearAll(): void {
+    servicingNotificationManager.clearNotificationHistory()
+}
+
 function close(): void {
     modalManager.closeModal(NOTIFICATION_CENTER_URL)
 }
@@ -126,7 +130,8 @@ loadHistory()
     <ModalWindow>
         <VLabDialog
             :model-value="true"
-            max-width="40rem"
+            width="66.67vw"
+            max-width="66.67vw"
             scrollable
             @update:model-value="handleVisibilityChange($event)"
         >
@@ -165,6 +170,17 @@ loadHistory()
                         </div>
                     </VListItem>
                 </VList>
+            </template>
+
+            <template #reject-button>
+                <VBtn
+                    variant="tonal"
+                    prepend-icon="mdi-delete-sweep-outline"
+                    :disabled="entries.length === 0"
+                    @click="clearAll"
+                >
+                    {{ t('notification.center.button.clearAll') }}
+                </VBtn>
             </template>
         </VLabDialog>
     </ModalWindow>

@@ -89,7 +89,7 @@ for the full flow):
   - notification panel: push events `onNotificationCreated(dto)`,
     `onNotificationClosureRequested(id)`; send `notificationClicked(id)`, `notificationClosed(id)`.
   - history/center/badge: invoke `getNotificationHistory()` → `NotificationHistoryEntryDto[]`;
-    send `markAllNotificationsRead()`, `historyEntryClicked(id)`; push `onHistoryChanged(unreadCount)`
+    send `markAllNotificationsRead()`, `clearNotificationHistory()`, `historyEntryClicked(id)`; push `onHistoryChanged(unreadCount)`
     (fanned out to the skeleton **and** every modal). `NotificationHistoryEntryDto` carries `id`,
     `severity`, `source` (a `NotificationSourceDto` — with `connectionId` for instance sources, so
     the renderer resolves the connection name itself via `labConnectionManager.getConnection`),

@@ -120,6 +120,9 @@
     "center": {
       "title": "Notifications",
       "empty": "No notifications yet.",
+      "button": {
+        "clearAll": "Clear all"
+      },
       "source": {
         "unknownConnection": "Unknown connection"
       }

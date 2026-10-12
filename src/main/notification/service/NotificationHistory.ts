@@ -56,6 +56,16 @@ export class NotificationHistory {
     }
 
     /**
+     * Removes all entries.
+     * @return `true` when at least one entry was removed, `false` when the history was already empty
+     */
+    clear(): boolean {
+        const changed = this.entries.length > 0
+        this.entries.length = 0
+        return changed
+    }
+
+    /**
      * Returns the number of unread entries.
      */
     unreadCount(): number {
