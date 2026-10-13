@@ -53,11 +53,11 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, macos-13]
+        os: [macos-latest, macos-latest-large]
         include:
           - os: macos-latest
             arch: 'arm64'
-          - os: macos-13
+          - os: macos-latest-large
             arch: 'x64'
 
     runs-on: ${{ matrix.os }}
